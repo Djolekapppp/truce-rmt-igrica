@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://cop44c8gli06q"]
+
+[ext_resource type="Script" uid="uid://cgirdamvxne67" path="res://scripts/MainMenu.cs" id="1_5p55f"]
+
+[node name="Control" type="Control" unique_id=669619120]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5p55f")
+
+[node name="StatusLabel" type="Label" parent="." unique_id=1468972801]
+layout_mode = 0
+offset_left = 477.0
+offset_top = 280.0
+offset_right = 632.0
+offset_bottom = 303.0
+text = "Status: nije povezan"
+
+[node name="Button" type="Button" parent="." unique_id=1424893460]
+layout_mode = 0
+offset_left = 508.0
+offset_top = 338.0
+offset_right = 575.0
+offset_bottom = 371.0
+text = "Poveži se"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

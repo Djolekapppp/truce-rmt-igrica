@@ -1,5 +1,6 @@
 # Godot
 client/.godot/
+client/.editorconfig
 
 # Rust
 server/target/
