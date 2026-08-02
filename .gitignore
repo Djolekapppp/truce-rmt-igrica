@@ -1,0 +1,13 @@
+# Godot
+client/.godot/
+
+# Rust
+server/target/
+common/common_rust/target/
+
+# C#
+**/bin/
+**/obj/
+
+# Linux
+*~

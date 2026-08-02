@@ -1,0 +1,11 @@
+[package]
+name = "Server"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+common = { path="../common/common_rust" }
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+rmp-serde = "1.3"
+
