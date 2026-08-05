@@ -1,16 +1,28 @@
 use std::{sync::Arc, collections::HashMap};
-use tokio::{net::TcpListener, sync::Mutex};
-use crate::client_handler::ClientHandler;
+use tokio::{net::TcpListener, sync::{Mutex, mpsc}};
+use crate::{client_handler::ClientHandler, room_manager::{RoomManager, RoomRequest}};
 
 
 pub struct Server {
-    clients: Arc<Mutex<HashMap<u32, String>>>,
+    clients: Arc<Mutex<HashMap<u32, mpsc::Sender<common::Message>>>>,
+    room_sender: mpsc::Sender<RoomRequest>,
 }
 
 impl Server {
     pub fn new() -> Self {
+        let (room_sender, room_receiver) = mpsc::channel(100);
+
+        let clients = Arc::new(Mutex::new(HashMap::new()));
+
+        let room_manager = RoomManager::new(clients.clone());
+
+        tokio::spawn(async move {
+            room_manager.run(room_receiver).await;
+        });
+
         Server {
-            clients: Arc::new(Mutex::new(HashMap::new())),
+            clients: clients,
+            room_sender,
         }
     }
 
@@ -23,18 +35,13 @@ impl Server {
 
         loop {
             let (stream, addr) = listener.accept().await?;
-            println!("New client connected: {}", addr);
+            // println!("New client connected: {}", addr);
 
+            let (tx, rx) = mpsc::channel(32);
             let id = next_id;
+            let room_sender = self.room_sender.clone();
             next_id += 1;
 
-            {
-                //lockujemo clients radi thread safety 
-                let mut clients = self.clients.lock().await; 
-                clients.insert(id, addr.to_string());
-
-                println!("Current clients: {:?}\n", clients);
-            }
             //dropuje se mut clients i sa njim lock na njemu
             
             //Klonira se referenca (Arc) ne hashmapa,
@@ -44,7 +51,13 @@ impl Server {
             // Spawn a new task to handle the client connections
             tokio::spawn(async move {
                 let mut handler = 
-                    ClientHandler::new(stream);
+                    ClientHandler::new(stream, id, rx, room_sender);
+
+                {
+                    //lockujemo clients radi thread safety 
+                    let mut clients = clients.lock().await; 
+                    clients.insert(id, tx);
+                }
                 handler.handle_client().await;
 
                 let mut clients = clients.lock().await;

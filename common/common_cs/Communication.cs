@@ -27,7 +27,7 @@ public class Communication {
         stream = new NetworkStream(socket);
     }
 
-    public IGameMessage RecieveMessage() {
+    public IGameMessage ReceiveMessage() {
         byte[] buffer = new byte[4];
 
         try {
@@ -40,6 +40,30 @@ public class Communication {
             byte[] messageBuffer = new byte[len];
 
             stream.ReadExactly(messageBuffer, 0, messageBuffer.Length);
+
+            var message = MessagePack.MessagePackSerializer
+                .Deserialize<IGameMessage>(messageBuffer);
+
+            return message;
+        }
+        catch (Exception ex) {
+            throw new Exception($"Error receiving message: {ex}");
+        }
+    }
+
+    public async Task<IGameMessage> ReceiveMessageAsync() {
+        byte[] buffer = new byte[4];
+
+        try {
+            await stream.ReadExactlyAsync(buffer, 0, buffer.Length);
+
+            int len = BitConverter.ToInt32(buffer, 0);
+
+            Console.WriteLine($"Received message length: {len}");
+
+            byte[] messageBuffer = new byte[len];
+
+            await stream.ReadExactlyAsync(messageBuffer, 0, messageBuffer.Length);
 
             var message = MessagePack.MessagePackSerializer
                 .Deserialize<IGameMessage>(messageBuffer);

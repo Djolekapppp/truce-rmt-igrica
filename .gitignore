@@ -1,6 +1,7 @@
 # Godot
 client/.godot/
 client/.editorconfig
+client/export_presets.cfg
 
 # Rust
 server/target/

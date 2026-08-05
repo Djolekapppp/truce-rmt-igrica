@@ -1,5 +1,6 @@
 mod server;
 mod client_handler;
+mod room_manager;
 
 
 use server::Server;
