@@ -35,8 +35,6 @@ public class Communication {
 
             int len = BitConverter.ToInt32(buffer, 0);
 
-            Console.WriteLine($"Received message length: {len}");
-
             byte[] messageBuffer = new byte[len];
 
             stream.ReadExactly(messageBuffer, 0, messageBuffer.Length);
@@ -58,8 +56,6 @@ public class Communication {
             await stream.ReadExactlyAsync(buffer, 0, buffer.Length);
 
             int len = BitConverter.ToInt32(buffer, 0);
-
-            Console.WriteLine($"Received message length: {len}");
 
             byte[] messageBuffer = new byte[len];
 
