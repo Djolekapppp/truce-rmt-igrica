@@ -6,10 +6,11 @@ use crate::{client_handler::ClientHandler, room_manager::{RoomManager, RoomReque
 pub struct Server {
     clients: Arc<Mutex<HashMap<u32, mpsc::Sender<common::Message>>>>,
     room_sender: mpsc::Sender<RoomRequest>,
+    addr: String,
 }
 
 impl Server {
-    pub fn new() -> Self {
+    pub fn new(address: String, port: String) -> Self {
         let (room_sender, room_receiver) = mpsc::channel(100);
 
         let clients = Arc::new(Mutex::new(HashMap::new()));
@@ -19,22 +20,24 @@ impl Server {
         tokio::spawn(async move {
             room_manager.run(room_receiver).await;
         });
+        let addr = address + ":" + &port;
 
         Server {
             clients: clients,
             room_sender,
+            addr,
         }
     }
 
     pub async fn start(&self) -> Result<(), Box<dyn std::error::Error>> {
         // Start the server and listen for incoming connections
-        let listener = TcpListener::bind("127.0.0.1:8080").await?;
+        let listener = TcpListener::bind(self.addr.clone()).await?;
         println!("Server is listening on 127.0.0.1:8080");
 
         let mut next_id = 0;
 
         loop {
-            let (stream, addr) = listener.accept().await?;
+            let (stream, _addr) = listener.accept().await?;
             // println!("New client connected: {}", addr);
 
             let (tx, rx) = mpsc::channel(32);

@@ -74,6 +74,69 @@ public class ChatData
 }
 
 [MessagePackObject]
+public class CardMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "Card";
+
+    [Key("payload")]
+    public CardData Data { get; set; } = new();
+}
+
+[MessagePackObject]
+public class CardData
+{
+    [Key("name")]
+    public string Name { get; set; } = "";
+}
+
+[MessagePackObject]
+public class HandMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "Hand";
+
+    [Key("payload")]
+    public HandData Data { get; set; } = new();
+}
+
+[MessagePackObject]
+public class HandData
+{
+    [Key("cards")]
+    public List<string> Cards { get; set; } = new();
+}
+
+[MessagePackObject]
+public class GameStateMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "GameState";
+
+    [Key("payload")]
+    public GameStateData Data { get; set; } = new();
+}
+
+[MessagePackObject]
+public class GameStateData
+{
+    [Key("seed")]
+    public uint Seed { get; set; } = 0;
+
+    [Key("turn")]
+    public uint Turn { get; set; } = 0;
+
+    [Key("nature")]
+    public int Nature { get; set; } = 0;
+
+    [Key("faith")]
+    public int Faith { get; set; } = 0;
+
+    [Key("science")]
+    public int Science { get; set; } = 0;
+}
+
+[MessagePackObject]
 public class ResponseMessage : IGameMessage
 {
     [Key("kind")]
@@ -151,6 +214,9 @@ public class GameMessageFormatter : IMessagePackFormatter<IGameMessage>
             "CreateRoom" => MessagePackSerializer.Deserialize<CreateRoomMessage>(ref reader, options),
             "LeaveRoom" => MessagePackSerializer.Deserialize<LeaveRoomMessage>(ref reader, options),
             "JoinRoom" => MessagePackSerializer.Deserialize<JoinRoomMessage>(ref reader, options),
+            "Card" => MessagePackSerializer.Deserialize<CardMessage>(ref reader, options),
+            "Hand" => MessagePackSerializer.Deserialize<HandMessage>(ref reader, options),
+            "GameState" => MessagePackSerializer.Deserialize<GameStateMessage>(ref reader, options),
             "Chat" => MessagePackSerializer.Deserialize<ChatMessage>(ref reader, options),
             "Response" => MessagePackSerializer.Deserialize<ResponseMessage>(ref reader, options),
             "Error" => MessagePackSerializer.Deserialize<ErrorMessage>(ref reader, options),

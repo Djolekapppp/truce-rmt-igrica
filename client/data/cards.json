@@ -1,0 +1,19 @@
+{
+    "Card 1" : 
+    {
+        "name":"Karta1",
+        "description":"Eine Karte",
+        "nature":1,
+        "faith":2,
+        "science":3
+    },
+    "Card 2" :
+    {
+        "name":"Karta2",
+        "description":"Eine Karte2",
+        "nature":4,
+        "faith":5,
+        "science":6
+    }
+}
+

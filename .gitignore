@@ -4,6 +4,7 @@ client/.editorconfig
 client/export_presets.cfg
 
 # Rust
+server/.env
 server/target/
 common/common_rust/target/
 
