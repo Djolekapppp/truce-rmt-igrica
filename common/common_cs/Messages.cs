@@ -74,6 +74,37 @@ public class ChatData
 }
 
 [MessagePackObject]
+public class ReadyMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "Ready";
+
+    [Key("payload")]
+    public ReadyData Data { get; set; } = new();
+}
+
+[MessagePackObject]
+public class ReadyData
+{
+    [Key("is_ready")]
+    public String Class { get; set; } = "";
+}
+
+[MessagePackObject]
+public class UnreadyMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "Unready";
+}
+
+[MessagePackObject]
+public class GameOverMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "GameOver";
+}
+
+[MessagePackObject]
 public class CardMessage : IGameMessage
 {
     [Key("kind")]
@@ -105,6 +136,22 @@ public class HandData
 {
     [Key("cards")]
     public List<string> Cards { get; set; } = new();
+}
+
+[MessagePackObject]
+public class StartGameMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "StartGame";
+    
+    [Key("payload")]
+    public StartGameData Data { get; set; } = new();
+}
+
+public class StartGameData
+{
+    [Key("seed")]
+    public long Seed { get; set; }
 }
 
 [MessagePackObject]
@@ -216,6 +263,7 @@ public class GameMessageFormatter : IMessagePackFormatter<IGameMessage>
             "JoinRoom" => MessagePackSerializer.Deserialize<JoinRoomMessage>(ref reader, options),
             "Card" => MessagePackSerializer.Deserialize<CardMessage>(ref reader, options),
             "Hand" => MessagePackSerializer.Deserialize<HandMessage>(ref reader, options),
+            "StartGame" => MessagePackSerializer.Deserialize<StartGameMessage>(ref reader, options),
             "GameState" => MessagePackSerializer.Deserialize<GameStateMessage>(ref reader, options),
             "Chat" => MessagePackSerializer.Deserialize<ChatMessage>(ref reader, options),
             "Response" => MessagePackSerializer.Deserialize<ResponseMessage>(ref reader, options),

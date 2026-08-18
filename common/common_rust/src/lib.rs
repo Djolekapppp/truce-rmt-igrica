@@ -12,20 +12,28 @@ pub enum Message {
     Chat {
         content: String,
     },
+    Ready {
+        class: String,
+    },
+    Unready,
+    StartGame {
+        seed: u64
+    },
     Card {
         name: String,
     },
+
     Hand {
         cards: Vec<String>,
     },
     GameState {
-        seed: u32,
+        seed: u64,
         turn: u32,
         nature: i32,
         faith: i32,
         science: i32,
     },
-
+    GameOver,
     Response {
         content: String,
     },

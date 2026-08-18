@@ -7,6 +7,7 @@ const CARDS_FILE_PATH: &str = include_str!("./cards.json");
 #[derive(Serialize, Deserialize)]
 pub struct Card {
     pub name: String,
+    pub class: String,
     pub description: String, 
     pub nature: i32, 
     pub faith: i32,

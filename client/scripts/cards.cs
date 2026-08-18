@@ -6,6 +6,7 @@ public class Card
 {
     //Ovde moze da ide i slika ili tako neš
     public string Name { get; set; } = "";
+    public string Class { get; set; } = "";
     public string Description { get; set; } = "";
     public int Nature { get; set; } = 0;
     public int Faith { get; set; } = 0;
