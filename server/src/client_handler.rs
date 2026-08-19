@@ -39,7 +39,11 @@ impl ClientHandler {
                     match result {
                         Ok(message) => {
                             println!("Received message: {:?}", message);
-                            self.room_sender.send(RoomRequest { player_id: self.id, message }).await.unwrap();
+                            if let Err(e) = 
+                                self.room_sender.send(RoomRequest { player_id: self.id, message })
+                                    .await {
+                                        println!("Error sending message to room manager: {}", e);
+                            };
                         }
                         Err(e) => {
                             println!("Error reading message: {}", e);
@@ -56,6 +60,13 @@ impl ClientHandler {
                     }
                 }
             }
+        }
+
+        if let Err(e) = 
+            self.room_sender.send(
+                RoomRequest { player_id: self.id, message: common::Message::LeaveRoom })
+                .await {
+                    println!("Error sending leave room message: {}", e);
         }
     }
 

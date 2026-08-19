@@ -116,7 +116,7 @@ impl RoomManager {
                 common::Message::Connect { username } => {
                     println!("Player {} connected with username: {}", player_id, username);
                     self.create_player(player_id, username.clone());
-                    let _ = self.send_to_player(player_id,
+                    self.send_to_player(player_id,
                         common::Message::Response 
                         { content: format!("Welcome, {}!", username) }).await;
                 }
@@ -124,13 +124,13 @@ impl RoomManager {
                     match self.create_room(next_room_id, player_id) {
                         Ok(_) => {
                             next_room_id += 1;
-                            let _ = self.send_to_player(player_id, 
+                            self.send_to_player(player_id, 
                                 common::Message::Response {
                                     content: format!("Room {} created", next_room_id - 1),
                                 }).await;
                         }
                         Err(err) => {
-                            let _ = self.send_to_player(player_id, 
+                            self.send_to_player(player_id, 
                                 common::Message::Error {
                                     message: err,
                                 }).await;
@@ -140,13 +140,13 @@ impl RoomManager {
                 common::Message::JoinRoom { room_id } => {
                     match self.join_room(player_id, room_id) {
                         Ok(_) => {
-                            let _ = self.broadcast_to_room(room_id, 
+                            self.broadcast_to_room(room_id, 
                                 common::Message::Response {
                                     content: format!("Player {} joined room {}", player_id, room_id),
                                 }).await;
                         }
                         Err(err) => {
-                            let _ = self.send_to_player(player_id, 
+                            self.send_to_player(player_id, 
                                 common::Message::Error {
                                     message: err,
                                 }).await;
@@ -156,13 +156,13 @@ impl RoomManager {
                 common::Message::LeaveRoom => {
                     match self.leave_room(player_id) {
                         Ok(_) => {
-                            let _ = self.send_to_player(player_id, 
+                            self.send_to_player(player_id, 
                                 common::Message::Response {
                                     content: "Left the room".to_string(),
                                 }).await;
                         }
                         Err(err) => {
-                            let _ = self.send_to_player(player_id, 
+                            self.send_to_player(player_id, 
                                 common::Message::Error {
                                     message: err,
                                 }).await;
@@ -184,19 +184,19 @@ impl RoomManager {
                             if let Some(player) = self.players.get_mut(&player_id) {
                                 player.class = class.clone();
                                 player.ready = true;
-                                let _ = self.broadcast_to_room(*room_id, 
+                                self.broadcast_to_room(*room_id, 
                                     common::Message::Response {
                                         content: format!("Player {} is ready", player_id),
                                     }).await;
                             }
                         } else {
-                            let _ = self.send_to_player(player_id, 
+                            self.send_to_player(player_id, 
                                 common::Message::Error {
                                     message: format!("Class {} is already taken", class),
                                 }).await;
                         }
                     } else {
-                        let _ = self.send_to_player(player_id, 
+                        self.send_to_player(player_id, 
                             common::Message::Error {
                                 message: "You are not in a room".to_string(),
                             }).await;
@@ -206,7 +206,7 @@ impl RoomManager {
                     if let Some(room_id) = self.player_room.get(&player_id) {
                         if let Some(player) = self.players.get_mut(&player_id) {
                             player.unready();
-                            let _ = self.broadcast_to_room(*room_id, 
+                            self.broadcast_to_room(*room_id, 
                                 common::Message::Response {
                                     content: format!("Player {} is not ready", player_id),
                                 }).await;
@@ -237,27 +237,23 @@ impl RoomManager {
                                         science: room.game.science,
                                     }
                                 } else {
-                                    let _ = self.send_to_player(player_id, 
+                                    self.send_to_player(player_id, 
                                         common::Message::Error {
                                             message: "Not all players are ready".to_string(),
                                         }).await;
                                     continue;
                                 }
                             } else {
-                                let _ = self.send_to_player(player_id, 
+                                self.send_to_player(player_id, 
                                     common::Message::Error {
                                         message: "Room not found".to_string(),
                                     }).await;
                                 continue;
                             }
                         };
-                        let _ = self.broadcast_to_room(*room_id, 
-                            common::Message::Response {
-                                content: "Game started".to_string(),
-                            }).await;
-
-                        let _ = self.broadcast_to_room(*room_id, 
+                        self.broadcast_to_room(*room_id, 
                             game_state_message).await;
+                        self.send_hands(*room_id);
                     } 
                 }
                 common::Message::Card { name } => {
@@ -275,7 +271,7 @@ impl RoomManager {
                                         }
                                     }
                                     Err(err) => {
-                                        let _ = self.send_to_player(player_id, 
+                                        self.send_to_player(player_id, 
                                             common::Message::Error {
                                                 message: err,
                                             }).await;
@@ -284,7 +280,7 @@ impl RoomManager {
                                 }
 
                             } else {
-                                let _ = self.send_to_player(player_id, 
+                                self.send_to_player(player_id, 
                                     common::Message::Error {
                                         message: "Room not found".to_string(),
                                     }).await;
@@ -293,15 +289,18 @@ impl RoomManager {
                         };
                         if let Some(room) = self.rooms.get_mut(room_id) {
                             if room.game.is_lost() {
-                                let _ = self.broadcast_to_room(*room_id, 
+                                self.broadcast_to_room(*room_id, 
                                     common::Message::GameOver).await;
                             }
                         }
 
                         self.broadcast_to_room(*room_id, 
                             game_state_message).await;
+
+                        self.send_hands(*room_id);
+
                     } else {
-                        let _ = self.send_to_player(player_id, 
+                        self.send_to_player(player_id, 
                             common::Message::Error {
                                 message: "Game has not started yet".to_string(),
                             }).await;
@@ -330,7 +329,9 @@ impl RoomManager {
             for player_id in room.players.iter().flatten().map(|p| p.id) {
                 let sender = clients_lock.get(&player_id);
                 if let Some(sender) = sender {
-                    sender.send(message.clone()).await.unwrap();
+                    if let Err(e) = sender.send(message.clone()).await {
+                        eprintln!("Failed to send message to player {}: {}", player_id, e);
+                    }
                 }
             }
         }
@@ -435,7 +436,7 @@ impl RoomManager {
                 let hand_message = common::Message::Hand {
                     cards: room.game.get_hand(player.class.clone()),
                 };
-                let _ = self.send_to_player(player.id, hand_message);
+                self.send_to_player(player.id, hand_message);
             }
         }
     }
