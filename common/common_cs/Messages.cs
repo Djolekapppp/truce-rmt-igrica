@@ -148,6 +148,7 @@ public class StartGameMessage : IGameMessage
     public StartGameData Data { get; set; } = new();
 }
 
+[MessagePackObject]
 public class StartGameData
 {
     [Key("seed")]
