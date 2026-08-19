@@ -173,6 +173,9 @@ public class GameStateData
     [Key("turn")]
     public uint Turn { get; set; } = 0;
 
+    [Key("epoch")]
+    public uint Epoch { get; set; } = 0;
+
     [Key("nature")]
     public int Nature { get; set; } = 0;
 

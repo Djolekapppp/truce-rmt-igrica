@@ -29,6 +29,7 @@ pub enum Message {
     GameState {
         seed: u64,
         turn: u32,
+        epoch: u32,
         nature: i32,
         faith: i32,
         science: i32,

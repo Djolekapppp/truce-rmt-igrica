@@ -50,7 +50,7 @@ public partial class MainMenu : Control {
             _nametag.Text = "Username: " + txtUsername.Text;
 
 
-            Task.Run(ListenToServer);
+            await Task.Run(ListenToServer);
 
         } catch (Exception ex) {
             _statusLabel.Text = "Server vratio gresku:" + ex.ToString();

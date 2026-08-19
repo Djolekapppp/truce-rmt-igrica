@@ -13,6 +13,7 @@ static CARDS: LazyLock<HashMap<String, Card>> = LazyLock::new(|| {
 struct GameState {
     seed: u64,
     turn: u32,
+    epoch: u32,
     nature: i32,
     faith: i32,
     science: i32,
@@ -25,15 +26,19 @@ impl GameState {
             self.faith += card.faith;
             self.science += card.science;
             self.turn += 1;
+            self.epoch = (self.turn-1) / 2 + 1;
             Ok(())
         } else {
             Err(format!("Card {} not found", card))
         }
     }
 
-    fn get_hand(&self, class: String) -> Vec<String> {
+    fn get_hand(&self, class: String, exclude: &[String]) -> Vec<String> {
         let mut deck: Vec<&String> = CARDS.iter()
-            .filter(|(_, card)| *card.class == class)
+            .filter(|(key, card)| *card.class == class
+                && !exclude.contains(key)
+                && card.epoch == self.epoch) 
+               
             .map(|(key, _)| key).collect();
 
         deck.shuffle(&mut StdRng::seed_from_u64(self.seed + self.turn as u64));
@@ -76,17 +81,8 @@ pub struct Player {
     pub id: u32, 
     pub username: String,
     pub class: String,
+    pub hand: Vec<String>,
     pub ready: bool,
-}
-
-impl Player {
-    pub fn ready(&mut self) {
-        self.ready = true;
-    }
-
-    pub fn unready(&mut self) {
-        self.ready = false;
-    }
 }
 
 
@@ -205,7 +201,7 @@ impl RoomManager {
                 common::Message::Unready => {
                     if let Some(room_id) = self.player_room.get(&player_id) {
                         if let Some(player) = self.players.get_mut(&player_id) {
-                            player.unready();
+                            player.ready = false;
                             self.broadcast_to_room(*room_id, 
                                 common::Message::Response {
                                     content: format!("Player {} is not ready", player_id),
@@ -224,6 +220,7 @@ impl RoomManager {
                                     room.game = GameState {
                                         seed: actual_seed,
                                         turn: 1,
+                                        epoch: 1,
                                         nature: 10,
                                         faith: 10,
                                         science: 10,
@@ -232,6 +229,7 @@ impl RoomManager {
                                     common::Message::GameState {
                                         seed: actual_seed,
                                         turn: room.game.turn,
+                                        epoch: room.game.epoch,
                                         nature: room.game.nature,
                                         faith: room.game.faith,
                                         science: room.game.science,
@@ -253,7 +251,7 @@ impl RoomManager {
                         };
                         self.broadcast_to_room(*room_id, 
                             game_state_message).await;
-                        self.send_hands(*room_id);
+                        self.send_hands(*room_id).await;
                     } 
                 }
                 common::Message::Card { name } => {
@@ -265,6 +263,7 @@ impl RoomManager {
                                         common::Message::GameState {
                                             seed: room.game.seed,
                                             turn: room.game.turn,
+                                            epoch: room.game.epoch,
                                             nature: room.game.nature,
                                             faith: room.game.faith,
                                             science: room.game.science,
@@ -297,7 +296,7 @@ impl RoomManager {
                         self.broadcast_to_room(*room_id, 
                             game_state_message).await;
 
-                        self.send_hands(*room_id);
+                        self.send_hands(*room_id).await;
 
                     } else {
                         self.send_to_player(player_id, 
@@ -345,6 +344,7 @@ impl RoomManager {
         let game_state = GameState {
             seed: rand::random(),
             turn: 0,
+            epoch: 0,
             nature: 0,
             faith: 0,
             science: 0,
@@ -410,8 +410,9 @@ impl RoomManager {
     fn create_player(&mut self, player_id: u32, username: String) -> u32 {
         let player = Player {
             id: player_id,
-            username,
+            username: username,
             class: "".to_string(),
+            hand: vec!["".to_string(),"".to_string()],
             ready: false,
         };
         self.players.insert(player_id, player);
@@ -430,14 +431,32 @@ impl RoomManager {
         self.player_room.get(&player_id).cloned()
     }
 
-    fn send_hands(&mut self, room_id: u32) {
-        if let Some(room) = self.rooms.get(&room_id) {
-            for player in room.players.iter().flatten() {
-                let hand_message = common::Message::Hand {
-                    cards: room.game.get_hand(player.class.clone()),
-                };
-                self.send_to_player(player.id, hand_message);
+    async fn send_hands(&mut self, room_id: u32) {
+        let messages = {
+            let Some(room) = self.rooms.get_mut(&room_id) else {
+                return;
+            };
+
+            let mut messages = Vec::new();
+
+            for player in room.players.iter_mut().flatten() {
+                let cards = room.game.get_hand(player.class.clone(), &player.hand);
+
+                player.hand = cards.clone();
+
+                messages.push((
+                        player.id,
+                        common::Message::Hand {
+                            cards,
+                        },
+                ));
+
             }
+            messages
+        };
+
+        for (player_id, message) in messages {
+            self.send_to_player(player_id, message).await;
         }
     }
 }
