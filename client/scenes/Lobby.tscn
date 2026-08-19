@@ -1,0 +1,150 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/Lobby.cs" id="1_lobby"]
+
+[node name="Lobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lobby")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.09, 0.12, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Header" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="RoomLabel" type="Label" parent="Margin/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "Soba -"
+
+[node name="LeaveButton" type="Button" parent="Margin/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Napusti sobu"
+
+[node name="Sep1" type="HSeparator" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="Columns" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="PlayersColumn" type="VBoxContainer" parent="Margin/VBox/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.4
+theme_override_constants/separation = 10
+
+[node name="PlayersTitle" type="Label" parent="Margin/VBox/Columns/PlayersColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Igraci"
+
+[node name="PlayerList" type="VBoxContainer" parent="Margin/VBox/Columns/PlayersColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Filler" type="Control" parent="Margin/VBox/Columns/PlayersColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ChoiceColumn" type="VBoxContainer" parent="Margin/VBox/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="ChoiceTitle" type="Label" parent="Margin/VBox/Columns/ChoiceColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Izaberi rasu"
+
+[node name="FactionList" type="VBoxContainer" parent="Margin/VBox/Columns/ChoiceColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Sep2" type="HSeparator" parent="Margin/VBox/Columns/ChoiceColumn"]
+layout_mode = 2
+
+[node name="ReadyButton" type="Button" parent="Margin/VBox/Columns/ChoiceColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+disabled = true
+text = "Spreman sam"
+
+[node name="StartButton" type="Button" parent="Margin/VBox/Columns/ChoiceColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+disabled = true
+text = "Start Game"
+
+[node name="HintLabel" type="Label" parent="Margin/VBox/Columns/ChoiceColumn"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.6)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Filler2" type="Control" parent="Margin/VBox/Columns/ChoiceColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Sep3" type="HSeparator" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="Log" type="RichTextLabel" parent="Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+bbcode_enabled = true
+scroll_following = true
+
+[node name="ChatRow" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ChatEdit" type="LineEdit" parent="Margin/VBox/ChatRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "poruka..."
+
+[node name="ChatSend" type="Button" parent="Margin/VBox/ChatRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Posalji"

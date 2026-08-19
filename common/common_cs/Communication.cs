@@ -27,6 +27,26 @@ public class Communication {
         stream = new NetworkStream(socket);
     }
 
+    /// <summary>
+    /// Zatvara soket i stream. Posle ovoga se sme ponovo pozvati Connect.
+    /// </summary>
+    public void Close() {
+        try {
+            stream?.Dispose();
+        } catch (Exception) {
+            // gasimo konekciju, greska ovde nista ne menja
+        }
+
+        try {
+            socket?.Close();
+        } catch (Exception) {
+            // isto
+        }
+
+        stream = null;
+        socket = null;
+    }
+
     public IGameMessage ReceiveMessage() {
         byte[] buffer = new byte[4];
 
