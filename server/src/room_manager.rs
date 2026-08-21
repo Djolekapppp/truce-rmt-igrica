@@ -68,18 +68,51 @@ impl GameState {
         Ok(())
     }
 
+    /// Sve karte date rase koje mogu da dodju u tekucoj epohi.
+    ///
+    /// Zlatno i mracno doba se ogledaju upravo ovde: rasa u zlatnom dobu
+    /// vuce iz jace polovine svog spila, rasa u mracnom dobu iz slabije,
+    /// a treca rasa iz celog spila. Raspored doba je fiksan, vidi
+    /// `common::golden_class`.
+    ///
+    /// Epohe 4-6 koriste spilove epoha 1-3 (`card.epoch + 3 == self.epoch`),
+    /// ali su tada na snazi modifikatori.
+    fn epoch_pool(&self, class: &str) -> Vec<String> {
+        let mut deck: Vec<(&String, &Card)> = CARDS.iter()
+            .filter(|(_, card)| card.class == class
+                && (card.epoch == self.epoch || card.epoch + 3 == self.epoch))
+            .map(|(key, card)| (key, card))
+            .collect();
+
+        // Jacina karte = ukupan uticaj na zadovoljstvo sve tri rase.
+        // Kljuc ulazi u poredjenje da bi rezultat bio isti bez obzira na
+        // redosled iteracije kroz HashMap.
+        let strength = |card: &Card| card.elves + card.dwarves + card.humans;
+        deck.sort_by(|a, b| strength(a.1).cmp(&strength(b.1)).then(a.0.cmp(b.0)));
+
+        let age = common::age_of(class, self.epoch);
+        let half = deck.len() / 2;
+
+        if half > 0 {
+            match age {
+                common::Age::Dark => deck.truncate(half),
+                common::Age::Golden => { deck.drain(..deck.len() - half); }
+                common::Age::Neutral => {}
+            }
+        }
+
+        deck.into_iter().map(|(key, _)| key.clone()).collect()
+    }
+
     fn get_hand(&self, class: String, exclude: &[String]) -> Vec<String> {
-        let mut deck: Vec<&String> = CARDS.iter()
-            .filter(|(key, card)| *card.class == class
-                && !exclude.contains(key)
-                && (card.epoch == self.epoch ||
-                   card.epoch + 3 == self.epoch))
-               
-            .map(|(key, _)| key).collect();
+        let mut deck: Vec<String> = self.epoch_pool(&class)
+            .into_iter()
+            .filter(|key| !exclude.contains(key))
+            .collect();
 
         deck.shuffle(&mut StdRng::seed_from_u64(self.seed + self.turn as u64));
 
-        deck.into_iter().take(2).cloned().collect()
+        deck.into_iter().take(2).collect()
     }
 
     fn is_lost(&self) -> bool {
@@ -285,6 +318,7 @@ impl RoomManager {
                         };
                         self.broadcast_to_room(*room_id, 
                             game_state_message).await;
+                        self.send_epoch_decks(*room_id).await;
                         self.send_hands(*room_id).await;
                     } 
                 }
@@ -366,11 +400,13 @@ impl RoomManager {
                                 ];
 
                                 let was_stage_two = room.game.epoch >= 4;
+                                let epoch_before = room.game.epoch;
                                 let update_result = room.game.apply_round(cards);
 
                                 match update_result {
                                     Ok(()) => {
                                         let starts_stage_two = !was_stage_two && room.game.epoch >= 4;
+                                        let epoch_changed = room.game.epoch != epoch_before;
                                         Ok(Some((
                                             common::Message::GameState {
                                                 seed: room.game.seed,
@@ -381,6 +417,7 @@ impl RoomManager {
                                                 humans: room.game.humans,
                                             },
                                             starts_stage_two,
+                                            epoch_changed,
                                         )))
                                     }
                                     Err(err) => Err(err),
@@ -392,14 +429,26 @@ impl RoomManager {
                     };
 
                     match result {
-                        Ok(Some((game_state_message, starts_stage_two))) => {
-                            if let Some(room) = self.rooms.get(&room_id) {
-                                if room.game.is_lost() {
-                                    self.broadcast_to_room(room_id, common::Message::GameOver).await;
-                                }
-                            }
-
+                        Ok(Some((game_state_message, starts_stage_two, epoch_changed))) => {
                             self.broadcast_to_room(room_id, game_state_message).await;
+
+                            // Partija se zavrsava na dva nacina: neka rasa je
+                            // pala na nulu, ili su izdrzane sve epohe.
+                            let outcome = self.rooms.get(&room_id).and_then(|room| {
+                                if room.game.is_lost() {
+                                    Some(false)
+                                } else if room.game.epoch > common::EPOCH_COUNT {
+                                    Some(true)
+                                } else {
+                                    None
+                                }
+                            });
+
+                            if let Some(won) = outcome {
+                                self.broadcast_to_room(room_id,
+                                    common::Message::GameOver { won }).await;
+                                continue;
+                            }
 
                             // Modifiers are assigned exactly when stage 2 begins.
                             // Each player is told their own modifier privately.
@@ -416,6 +465,10 @@ impl RoomManager {
                                         ).await;
                                     }
                                 }
+                            }
+
+                            if epoch_changed {
+                                self.send_epoch_decks(room_id).await;
                             }
 
                             self.send_hands(room_id).await;
@@ -685,6 +738,30 @@ impl RoomManager {
         self.player_room.get(&player_id).cloned()
     }
 
+    /// Salje svakom igracu ceo spil iz koga mu se te epohe vuku karte,
+    /// da bi mogao da ga pregleda u klijentu.
+    async fn send_epoch_decks(&self, room_id: u32) {
+        let messages = {
+            let Some(room) = self.rooms.get(&room_id) else {
+                return;
+            };
+
+            room.players.iter().flatten()
+                .map(|player| (
+                    player.id,
+                    common::Message::EpochDeck {
+                        epoch: room.game.epoch,
+                        cards: room.game.epoch_pool(&player.class),
+                    },
+                ))
+                .collect::<Vec<_>>()
+        };
+
+        for (player_id, message) in messages {
+            self.send_to_player(player_id, message).await;
+        }
+    }
+
     async fn send_hands(&mut self, room_id: u32) {
         let messages = {
             let Some(room) = self.rooms.get_mut(&room_id) else {
@@ -715,3 +792,114 @@ impl RoomManager {
     }
 }
 
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn state(epoch: u32) -> GameState {
+        GameState { seed: 1, turn: 1, epoch, elves: 40, dwarves: 40, humans: 40 }
+    }
+
+    fn strength(key: &str) -> i32 {
+        let card = &CARDS[key];
+        card.elves + card.dwarves + card.humans
+    }
+
+    #[test]
+    fn raspored_doba_se_ponavlja_na_svake_tri_epohe() {
+        for epoch in 1..=3 {
+            assert_eq!(common::golden_class(epoch), common::golden_class(epoch + 3));
+            assert_eq!(common::dark_class(epoch), common::dark_class(epoch + 3));
+        }
+
+        assert_eq!(common::golden_class(1), Some("elves"));
+        assert_eq!(common::dark_class(1), Some("humans"));
+        assert_eq!(common::golden_class(2), Some("humans"));
+        assert_eq!(common::dark_class(2), Some("dwarves"));
+        assert_eq!(common::golden_class(3), Some("dwarves"));
+        assert_eq!(common::dark_class(3), Some("elves"));
+    }
+
+    #[test]
+    fn zlatno_doba_dobija_jacu_polovinu_a_mracno_slabiju() {
+        for epoch in 1..=common::EPOCH_COUNT {
+            let game = state(epoch);
+
+            for class in common::CLASSES {
+                let pool = game.epoch_pool(class);
+                let weakest = pool.iter().map(|k| strength(k)).min().unwrap();
+                let strongest = pool.iter().map(|k| strength(k)).max().unwrap();
+
+                match common::age_of(class, epoch) {
+                    common::Age::Neutral => assert_eq!(pool.len(), 8,
+                        "epoha {} {}: mirno doba vuce iz celog spila", epoch, class),
+                    _ => assert_eq!(pool.len(), 4,
+                        "epoha {} {}: doba suzava spil na polovinu", epoch, class),
+                }
+
+                // Zlatna polovina mora biti jaca od mracne za istu rasu.
+                if common::age_of(class, epoch) == common::Age::Golden {
+                    assert!(weakest >= 0,
+                        "epoha {} {}: zlatno doba ne sme da sadrzi kartu jacine {}",
+                        epoch, class, weakest);
+                }
+
+                if common::age_of(class, epoch) == common::Age::Dark {
+                    assert!(strongest <= 0,
+                        "epoha {} {}: mracno doba ne sme da sadrzi kartu jacine {}",
+                        epoch, class, strongest);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn epohe_4_6_koriste_spilove_epoha_1_3() {
+        for epoch in 4..=6 {
+            for class in common::CLASSES {
+                for key in state(epoch).epoch_pool(class) {
+                    assert_eq!(CARDS[&key].epoch, epoch - 3,
+                        "epoha {} treba da vuce karte epohe {}", epoch, epoch - 3);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn ruka_ima_dve_karte_iz_spila_epohe() {
+        for epoch in 1..=common::EPOCH_COUNT {
+            let game = state(epoch);
+
+            for class in common::CLASSES {
+                let pool = game.epoch_pool(class);
+                let hand = game.get_hand(class.to_string(), &[]);
+
+                assert_eq!(hand.len(), 2, "epoha {} {}", epoch, class);
+                assert_ne!(hand[0], hand[1], "ruka ne sme imati istu kartu dvaput");
+
+                for key in &hand {
+                    assert!(pool.contains(key), "karta van spila epohe");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn modifikatori_deluju_samo_na_odgovarajuci_znak() {
+        // agitated pojacava samo negativne
+        assert_eq!(GameState::modify_value(-10, "agitated"), -11);
+        assert_eq!(GameState::modify_value(10, "agitated"), 10);
+
+        // skeptical slabi samo pozitivne
+        assert_eq!(GameState::modify_value(10, "skeptical"), 8);
+        assert_eq!(GameState::modify_value(-10, "skeptical"), -10);
+
+        // hyped pojacava sve
+        assert_eq!(GameState::modify_value(10, "hyped"), 13);
+        assert_eq!(GameState::modify_value(-10, "hyped"), -13);
+
+        // bez modifikatora nista se ne menja
+        assert_eq!(GameState::modify_value(7, ""), 7);
+    }
+}
