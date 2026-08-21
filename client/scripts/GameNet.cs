@@ -35,6 +35,7 @@ public partial class GameNet : Node {
 
     public event Action<LobbyStateData> LobbyUpdated;
     public event Action<GameStateData> GameStateUpdated;
+    // public event Action<ModifierData> ModifierAdded;
     public event Action<List<string>> HandUpdated;
     public event Action<string> ChatReceived;
     public event Action<string> InfoReceived;
@@ -183,6 +184,10 @@ public partial class GameNet : Node {
                 GameState = state.Data;
                 GameStateUpdated?.Invoke(state.Data);
                 break;
+
+            // case ModifierMessage modifier:
+            //     ModifierAdded?.Invoke(modifier.Data);
+            //     break;
 
             case HandMessage hand:
                 Hand = hand.Data.Cards;

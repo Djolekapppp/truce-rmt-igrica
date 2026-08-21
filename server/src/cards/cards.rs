@@ -10,9 +10,9 @@ pub struct Card {
     pub epoch: u32,
     pub class: String,
     pub description: String, 
-    pub nature: i32, 
-    pub faith: i32,
-    pub science: i32,
+    pub elves: i32, 
+    pub dwarves: i32,
+    pub humans: i32,
 }
 
 pub fn from_json(json: &str) -> HashMap<String, Card> {

@@ -1,56 +1,651 @@
 {
-    "Card 1": {
-        "name": "Karta1",
-        "epoch": 1,
-        "class": "dwarves",
-        "description": "Eine Karte",
-        "nature": 0,
-        "faith": 0,
-        "science": 3
-    },
-    "Card 2": {
-        "name": "Karta2",
-        "epoch": 1,
-        "class": "humans",
-        "description": "Eine Karte2",
-        "nature": 0,
-        "faith": 3,
-        "science": 0
-    },
-    "Card 3": {
-        "name": "Karta3",
+    "elv1_vD": {
+        "name": "Great Victory over the Dwarves",
         "epoch": 1,
         "class": "elves",
-        "description": "Eine Karte3",
-        "nature": 3,
-        "faith": 0,
-        "science": 0
+        "description": "A great warrior of the elves has defeated the dwarves in a great battle, bringing glory to the elven kingdom.",
+        "elves": 30,
+        "dwarves": -10,
+        "humans": 0
     },
-    "Card 4": {
-        "name": "Karta4",
-        "epoch": 2,
+    "elv1_vH": {
+        "name": "Great Victory over the Humans",
+        "epoch": 1,
+        "class": "elves",
+        "description": "A great warrior of the elves has defeated the humans in a great battle, bringing glory to the elven kingdom.",
+        "elves": 30,
+        "dwarves": 0,
+        "humans": -10
+    },
+    "elv1_lc": {
+        "name": "Lost Caravan",
+        "epoch": 1,
+        "class": "elves",
+        "description": "A caravan of elves has been lost in the wilderness, causing a loss to the elven kingdom.",
+        "elves": -10,
+        "dwarves": 0,
+        "humans": 0
+    },
+    "elv1_rt": {
+        "name": "Resource Theft",
+        "epoch": 1,
+        "class": "elves",
+        "description": "A group of elves has stolen resources from the dwarves and humans, causing distrust in both kingdoms.",
+        "elves": 0,
+        "dwarves": -5,
+        "humans": -5
+    },
+    "elv1_sH": {
+        "name": "A Warrior's Sacrifice",
+        "epoch": 1,
+        "class": "elves",
+        "description": "A brave warrior of the elves has sacrificed themselves in battle to help the humans, causing a loss to the elven kingdom but a gain to the human kingdom.",
+        "elves": -20,
+        "dwarves": 0,
+        "humans": 30
+    },
+    "elv1_vD-2": {
+        "name": "War Victory",
+        "epoch": 1,
+        "class": "elves",
+        "description": "The elves have won a great, long lasting war against the dwarves, bringing glory to the elven kingdom and causing a loss to the dwarven kingdom.",
+        "elves": 30,
+        "dwarves": -20,
+        "humans": 0
+    },
+    "elv1_fD": {
+        "name": "Famine in the Elven Kingdom",
+        "epoch": 1,
+        "class": "elves",
+        "description": "Famine in the Elven Kingdom causes a loss the both the elven and dwarven kingdoms, which relyed on them for food, but an economic gain in the human kingdom.",
+        "elves": -20,
+        "dwarves": -20,
+        "humans": 10
+    },
+    "elv1_aD": {
+        "name": "Joint Milirary Aid to the Dwarves",
+        "epoch": 1,
+        "class": "elves",
+        "description": "The elves and the humans have joined forces to help the dwarves in a great battle, bringing glory to the dwarven kingdom and causing a loss to both the elven and human kingdoms.",
+        "elves": -10,
+        "dwarves": 20,
+        "humans": -10
+    },
+    "dwa1_vH": {
+        "name": "Hard-Fought Victory over the Humans",
+        "epoch": 1,
         "class": "dwarves",
-        "description": "Eine Karte4",
-        "nature": -2,
-        "faith": -2,
-        "science": 6
+        "description": "A warrior of dwarves has defeated the humans in battle, bringing hard-fought glory to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": 20,
+        "humans": -10
     },
-    "Card 5": {
-        "name": "Karta5",
-        "epoch": 2,
+    "dwa1_vE": {
+        "name": "Hard-Fought Victory over the Elves",
+        "epoch": 1,
+        "class": "dwarves",
+        "description": "A warrior of dwarves has defeated the elves in battle, bringing hard-fought glory to the Dwarven Kingdom.",
+        "elves": -10,
+        "dwarves": 20,
+        "humans": 0
+    },
+    "dwa1_lc": {
+        "name": "Collapsed Mine Shaft",
+        "epoch": 1,
+        "class": "dwarves",
+        "description": "A mine shaft has collapsed on a company of dwarves, causing a loss to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": -10,
+        "humans": 0
+    },
+    "dwa1_rt": {
+        "name": "Smuggled Goods",
+        "epoch": 1,
+        "class": "dwarves",
+        "description": "A ring of dwarves smugglers has been caught trading illegally with both the elves and the humans, causing distrust in both kingdoms.",
+        "elves": -5,
+        "dwarves": 0,
+        "humans": -5
+    },
+    "dwa1_sE": {
+        "name": "A Warrior's Sacrifice",
+        "epoch": 1,
+        "class": "dwarves",
+        "description": "A brave dwarf has sacrificed themselves in battle to help the elves, causing a loss to the Dwarven Kingdom but a gain to the Elven Kingdom.",
+        "elves": 20,
+        "dwarves": -20,
+        "humans": 0
+    },
+    "dwa1_vH-2": {
+        "name": "War Victory",
+        "epoch": 1,
+        "class": "dwarves",
+        "description": "The dwarves have won a great, long lasting war against the humans, bringing glory to the Dwarven Kingdom and causing a heavy loss to the Human Kingdom.",
+        "elves": 0,
+        "dwarves": 20,
+        "humans": -20
+    },
+    "dwa1_tb": {
+        "name": "A Costly Blessing",
+        "epoch": 1,
+        "class": "dwarves",
+        "description": "Dwarves suffer a great loss in an event that benefits both the elves and the humans.",
+        "elves": 10,
+        "dwarves": -20,
+        "humans": 10
+    },
+    "dwa1_cq": {
+        "name": "Conquest on Two Fronts",
+        "epoch": 1,
+        "class": "dwarves",
+        "description": "The dwarves have plundered both the elves and the humans in a wide-ranging campaign, growing stronger while draining both kingdoms.",
+        "elves": -10,
+        "dwarves": 20,
+        "humans": -10
+    },
+    "hum1_vE": {
+        "name": "Hard-Fought Victory over the Elves",
+        "epoch": 1,
         "class": "humans",
-        "description": "Eine Karte5",
-        "nature": -2,
-        "faith": 6,
-        "science": -2
+        "description": "A warrior of humans has defeated the elves in battle, bringing hard-fought glory to the Human Kingdom.",
+        "elves": -10,
+        "dwarves": 0,
+        "humans": 16
     },
-    "Card 6": {
-        "name": "Karta6",
+    "hum1_vD": {
+        "name": "Hard-Fought Victory over the Dwarves",
+        "epoch": 1,
+        "class": "humans",
+        "description": "A warrior of humans has defeated the dwarves in battle, bringing hard-fought glory to the Human Kingdom.",
+        "elves": 0,
+        "dwarves": -10,
+        "humans": 16
+    },
+    "hum1_lc": {
+        "name": "Bandit Raid on the Roads",
+        "epoch": 1,
+        "class": "humans",
+        "description": "Bandits have raided a column of humans on the open road, causing a loss to the Human Kingdom.",
+        "elves": 0,
+        "dwarves": 0,
+        "humans": -10
+    },
+    "hum1_rt": {
+        "name": "Border Skirmishes",
+        "epoch": 1,
+        "class": "humans",
+        "description": "Border skirmishes involving humans have flared up against both the elves and the dwarves, causing distrust in both kingdoms.",
+        "elves": -5,
+        "dwarves": -5,
+        "humans": 0
+    },
+    "hum1_sD": {
+        "name": "A Warrior's Sacrifice",
+        "epoch": 1,
+        "class": "humans",
+        "description": "A brave human has sacrificed themselves in battle to help the dwarves, causing a loss to the Human Kingdom but a gain to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": 20,
+        "humans": -22
+    },
+    "hum1_vE-2": {
+        "name": "Hard-Fought Victory over the Elves",
+        "epoch": 1,
+        "class": "humans",
+        "description": "A warrior of humans has defeated the elves in battle, bringing hard-fought glory to the Human Kingdom.",
+        "elves": -15,
+        "dwarves": 0,
+        "humans": 15
+    },
+    "hum1_tb": {
+        "name": "A Costly Blessing",
+        "epoch": 1,
+        "class": "humans",
+        "description": "Humans suffer a great loss in an event that benefits both the elves and the dwarves.",
+        "elves": 10,
+        "dwarves": 10,
+        "humans": -20
+    },
+    "hum1_cq": {
+        "name": "Conquest on Two Fronts",
+        "epoch": 1,
+        "class": "humans",
+        "description": "The humans have plundered both the elves and the dwarves in a wide-ranging campaign, growing stronger while draining both kingdoms.",
+        "elves": -5,
+        "dwarves": -10,
+        "humans": 15
+    },
+    "elv2_vD": {
+        "name": "Hard-Fought Victory over the Dwarves",
         "epoch": 2,
         "class": "elves",
-        "description": "Eine Karte6",
-        "nature": 6,
-        "faith": -2,
-        "science": -2
+        "description": "A warrior of elves has defeated the dwarves in battle, bringing hard-fought glory to the Elven Kingdom.",
+        "elves": 20,
+        "dwarves": -10,
+        "humans": 0
+    },
+    "elv2_vH": {
+        "name": "Hard-Fought Victory over the Humans",
+        "epoch": 2,
+        "class": "elves",
+        "description": "A warrior of elves has defeated the humans in battle, bringing hard-fought glory to the Elven Kingdom.",
+        "elves": 20,
+        "dwarves": 0,
+        "humans": -10
+    },
+    "elv2_lc": {
+        "name": "Blighted Harvest",
+        "epoch": 2,
+        "class": "elves",
+        "description": "A blight has ruined the harvest of elves, causing a loss to the Elven Kingdom.",
+        "elves": -10,
+        "dwarves": 0,
+        "humans": 0
+    },
+    "elv2_rt": {
+        "name": "Poisoned Wells",
+        "epoch": 2,
+        "class": "elves",
+        "description": "Elves agents are blamed for poisoned wells found in both the Dwarven Kingdom and the Human Kingdom, causing distrust in both kingdoms.",
+        "elves": 0,
+        "dwarves": -5,
+        "humans": -5
+    },
+    "elv2_sH": {
+        "name": "A Warrior's Sacrifice",
+        "epoch": 2,
+        "class": "elves",
+        "description": "A brave elf has sacrificed themselves in battle to help the humans, causing a loss to the Elven Kingdom but a gain to the Human Kingdom.",
+        "elves": -20,
+        "dwarves": 0,
+        "humans": 20
+    },
+    "elv2_vD-2": {
+        "name": "War Victory",
+        "epoch": 2,
+        "class": "elves",
+        "description": "The elves have won a great, long lasting war against the dwarves, bringing glory to the Elven Kingdom and causing a heavy loss to the Dwarven Kingdom.",
+        "elves": 20,
+        "dwarves": -20,
+        "humans": 0
+    },
+    "elv2_tb": {
+        "name": "A Costly Blessing",
+        "epoch": 2,
+        "class": "elves",
+        "description": "Elves suffer a great loss in an event that benefits both the dwarves and the humans.",
+        "elves": -20,
+        "dwarves": 10,
+        "humans": 10
+    },
+    "elv2_cq": {
+        "name": "Conquest on Two Fronts",
+        "epoch": 2,
+        "class": "elves",
+        "description": "The elves have plundered both the dwarves and the humans in a wide-ranging campaign, growing stronger while draining both kingdoms.",
+        "elves": 20,
+        "dwarves": -10,
+        "humans": -10
+    },
+    "dwa2_vH": {
+        "name": "Hard-Fought Victory over the Humans",
+        "epoch": 2,
+        "class": "dwarves",
+        "description": "A warrior of dwarves has defeated the humans in battle, bringing hard-fought glory to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": 16,
+        "humans": -10
+    },
+    "dwa2_vE": {
+        "name": "Hard-Fought Victory over the Elves",
+        "epoch": 2,
+        "class": "dwarves",
+        "description": "A warrior of dwarves has defeated the elves in battle, bringing hard-fought glory to the Dwarven Kingdom.",
+        "elves": -10,
+        "dwarves": 16,
+        "humans": 0
+    },
+    "dwa2_lc": {
+        "name": "Flooded Tunnels",
+        "epoch": 2,
+        "class": "dwarves",
+        "description": "Rising waters have flooded the tunnels of dwarves, causing a loss to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": -10,
+        "humans": 0
+    },
+    "dwa2_rt": {
+        "name": "Sabotaged Trade Routes",
+        "epoch": 2,
+        "class": "dwarves",
+        "description": "dwarves have sabotaged trade routes used by both the elves and the humans, causing distrust in both kingdoms.",
+        "elves": -5,
+        "dwarves": 0,
+        "humans": -5
+    },
+    "dwa2_sE": {
+        "name": "A Warrior's Sacrifice",
+        "epoch": 2,
+        "class": "dwarves",
+        "description": "A brave dwarf has sacrificed themselves in battle to help the elves, causing a loss to the Dwarven Kingdom but a gain to the Elven Kingdom.",
+        "elves": 20,
+        "dwarves": -22,
+        "humans": 0
+    },
+    "dwa2_vH-2": {
+        "name": "Hard-Fought Victory over the Humans",
+        "epoch": 2,
+        "class": "dwarves",
+        "description": "A warrior of dwarves has defeated the humans in battle, bringing hard-fought glory to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": 15,
+        "humans": -15
+    },
+    "dwa2_tb": {
+        "name": "A Costly Blessing",
+        "epoch": 2,
+        "class": "dwarves",
+        "description": "Dwarves suffer a great loss in an event that benefits both the elves and the humans.",
+        "elves": 10,
+        "dwarves": -20,
+        "humans": 10
+    },
+    "dwa2_cq": {
+        "name": "Conquest on Two Fronts",
+        "epoch": 2,
+        "class": "dwarves",
+        "description": "The dwarves have plundered both the elves and the humans in a wide-ranging campaign, growing stronger while draining both kingdoms.",
+        "elves": -10,
+        "dwarves": 15,
+        "humans": -5
+    },
+    "hum2_vE": {
+        "name": "Great Victory over the Elves",
+        "epoch": 2,
+        "class": "humans",
+        "description": "A warrior of humans has defeated the elves in battle, bringing great glory to the Human Kingdom.",
+        "elves": -10,
+        "dwarves": 0,
+        "humans": 30
+    },
+    "hum2_vD": {
+        "name": "Great Victory over the Dwarves",
+        "epoch": 2,
+        "class": "humans",
+        "description": "A warrior of humans has defeated the dwarves in battle, bringing great glory to the Human Kingdom.",
+        "elves": 0,
+        "dwarves": -10,
+        "humans": 30
+    },
+    "hum2_lc": {
+        "name": "Plague in the Cities",
+        "epoch": 2,
+        "class": "humans",
+        "description": "A plague has swept through the cities of humans, causing a loss to the Human Kingdom.",
+        "elves": 0,
+        "dwarves": 0,
+        "humans": -10
+    },
+    "hum2_rt": {
+        "name": "Broken Trade Agreements",
+        "epoch": 2,
+        "class": "humans",
+        "description": "humans have broken trade agreements with both the elves and the dwarves, causing distrust in both kingdoms.",
+        "elves": -5,
+        "dwarves": -5,
+        "humans": 0
+    },
+    "hum2_sD": {
+        "name": "A Warrior's Sacrifice",
+        "epoch": 2,
+        "class": "humans",
+        "description": "A brave human has sacrificed themselves in battle to help the dwarves, causing a loss to the Human Kingdom but a gain to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": 30,
+        "humans": -20
+    },
+    "hum2_vE-2": {
+        "name": "War Victory",
+        "epoch": 2,
+        "class": "humans",
+        "description": "The humans have won a great, long lasting war against the elves, bringing glory to the Human Kingdom and causing a heavy loss to the Elven Kingdom.",
+        "elves": -20,
+        "dwarves": 0,
+        "humans": 30
+    },
+    "hum2_fE": {
+        "name": "Famine in the Human Kingdom",
+        "epoch": 2,
+        "class": "humans",
+        "description": "Famine in the Human Kingdom causes losses to both humans and the elves, who relied on each other for food and trade, but brings an economic gain to the Dwarven Kingdom.",
+        "elves": -20,
+        "dwarves": 10,
+        "humans": -20
+    },
+    "hum2_aE": {
+        "name": "Joint Military Aid to the Elves",
+        "epoch": 2,
+        "class": "humans",
+        "description": "The humans and the dwarves have joined forces to help the elves in a great battle, bringing glory to the Elven Kingdom and causing a loss to both the Human Kingdom and the Dwarven Kingdom.",
+        "elves": 20,
+        "dwarves": -10,
+        "humans": -10
+    },
+    "elv3_vD": {
+        "name": "Hard-Fought Victory over the Dwarves",
+        "epoch": 3,
+        "class": "elves",
+        "description": "A warrior of elves has defeated the dwarves in battle, bringing hard-fought glory to the Elven Kingdom.",
+        "elves": 16,
+        "dwarves": -10,
+        "humans": 0
+    },
+    "elv3_vH": {
+        "name": "Hard-Fought Victory over the Humans",
+        "epoch": 3,
+        "class": "elves",
+        "description": "A warrior of elves has defeated the humans in battle, bringing hard-fought glory to the Elven Kingdom.",
+        "elves": 16,
+        "dwarves": 0,
+        "humans": -10
+    },
+    "elv3_lc": {
+        "name": "Wildfire in the Forest",
+        "epoch": 3,
+        "class": "elves",
+        "description": "A wildfire has swept through lands settled by elves, causing a loss to the Elven Kingdom.",
+        "elves": -10,
+        "dwarves": 0,
+        "humans": 0
+    },
+    "elv3_rt": {
+        "name": "Raided Supply Lines",
+        "epoch": 3,
+        "class": "elves",
+        "description": "elves raiders have struck the supply lines of both the dwarves and the humans, causing distrust in both kingdoms.",
+        "elves": 0,
+        "dwarves": -5,
+        "humans": -5
+    },
+    "elv3_sH": {
+        "name": "A Warrior's Sacrifice",
+        "epoch": 3,
+        "class": "elves",
+        "description": "A brave elf has sacrificed themselves in battle to help the humans, causing a loss to the Elven Kingdom but a gain to the Human Kingdom.",
+        "elves": -22,
+        "dwarves": 0,
+        "humans": 20
+    },
+    "elv3_vD-2": {
+        "name": "Hard-Fought Victory over the Dwarves",
+        "epoch": 3,
+        "class": "elves",
+        "description": "A warrior of elves has defeated the dwarves in battle, bringing hard-fought glory to the Elven Kingdom.",
+        "elves": 15,
+        "dwarves": -15,
+        "humans": 0
+    },
+    "elv3_tb": {
+        "name": "A Costly Blessing",
+        "epoch": 3,
+        "class": "elves",
+        "description": "Elves suffer a great loss in an event that benefits both the dwarves and the humans.",
+        "elves": -20,
+        "dwarves": 10,
+        "humans": 10
+    },
+    "elv3_cq": {
+        "name": "Conquest on Two Fronts",
+        "epoch": 3,
+        "class": "elves",
+        "description": "The elves have plundered both the dwarves and the humans in a wide-ranging campaign, growing stronger while draining both kingdoms.",
+        "elves": 15,
+        "dwarves": -5,
+        "humans": -10
+    },
+    "dwa3_vH": {
+        "name": "Great Victory over the Humans",
+        "epoch": 3,
+        "class": "dwarves",
+        "description": "A warrior of dwarves has defeated the humans in battle, bringing great glory to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": 30,
+        "humans": -10
+    },
+    "dwa3_vE": {
+        "name": "Great Victory over the Elves",
+        "epoch": 3,
+        "class": "dwarves",
+        "description": "A warrior of dwarves has defeated the elves in battle, bringing great glory to the Dwarven Kingdom.",
+        "elves": -10,
+        "dwarves": 30,
+        "humans": 0
+    },
+    "dwa3_lc": {
+        "name": "Cave-In at the Deep Mines",
+        "epoch": 3,
+        "class": "dwarves",
+        "description": "A cave-in at the deep mines has trapped a crew of dwarves, causing a loss to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": -10,
+        "humans": 0
+    },
+    "dwa3_rt": {
+        "name": "Counterfeit Coin Scandal",
+        "epoch": 3,
+        "class": "dwarves",
+        "description": "Counterfeit coin minted by dwarves has been found circulating in both the Elven Kingdom and the Human Kingdom, causing distrust in both kingdoms.",
+        "elves": -5,
+        "dwarves": 0,
+        "humans": -5
+    },
+    "dwa3_sE": {
+        "name": "A Warrior's Sacrifice",
+        "epoch": 3,
+        "class": "dwarves",
+        "description": "A brave dwarf has sacrificed themselves in battle to help the elves, causing a loss to the Dwarven Kingdom but a gain to the Elven Kingdom.",
+        "elves": 30,
+        "dwarves": -20,
+        "humans": 0
+    },
+    "dwa3_vH-2": {
+        "name": "War Victory",
+        "epoch": 3,
+        "class": "dwarves",
+        "description": "The dwarves have won a great, long lasting war against the humans, bringing glory to the Dwarven Kingdom and causing a heavy loss to the Human Kingdom.",
+        "elves": 0,
+        "dwarves": 30,
+        "humans": -20
+    },
+    "dwa3_aE": {
+        "name": "Joint Military Aid to the Elves",
+        "epoch": 3,
+        "class": "dwarves",
+        "description": "The dwarves and the humans have joined forces to help the elves in a great battle, bringing glory to the Elven Kingdom and causing a loss to both the Dwarven Kingdom and the Human Kingdom.",
+        "elves": 10,
+        "dwarves": -20,
+        "humans": -20
+    },
+    "dwa3_fE": {
+        "name": "Famine in the Dwarven Kingdom",
+        "epoch": 3,
+        "class": "dwarves",
+        "description": "Famine in the Dwarven Kingdom causes losses to both dwarves and the elves, who relied on each other for food and trade, but brings an economic gain to the Human Kingdom.",
+        "elves": -10,
+        "dwarves": -10,
+        "humans": 20
+    },
+    "hum3_vE": {
+        "name": "Hard-Fought Victory over the Elves",
+        "epoch": 3,
+        "class": "humans",
+        "description": "A warrior of humans has defeated the elves in battle, bringing hard-fought glory to the Human Kingdom.",
+        "elves": -10,
+        "dwarves": 0,
+        "humans": 20
+    },
+    "hum3_vD": {
+        "name": "Hard-Fought Victory over the Dwarves",
+        "epoch": 3,
+        "class": "humans",
+        "description": "A warrior of humans has defeated the dwarves in battle, bringing hard-fought glory to the Human Kingdom.",
+        "elves": 0,
+        "dwarves": -10,
+        "humans": 20
+    },
+    "hum3_lc": {
+        "name": "Harsh Winter",
+        "epoch": 3,
+        "class": "humans",
+        "description": "An unusually harsh winter has taken its toll on humans, causing a loss to the Human Kingdom.",
+        "elves": 0,
+        "dwarves": 0,
+        "humans": -10
+    },
+    "hum3_rt": {
+        "name": "Diplomatic Insults",
+        "epoch": 3,
+        "class": "humans",
+        "description": "Diplomatic insults from the humans have offended both the elves and the dwarves, causing distrust in both kingdoms.",
+        "elves": -5,
+        "dwarves": -5,
+        "humans": 0
+    },
+    "hum3_sD": {
+        "name": "A Warrior's Sacrifice",
+        "epoch": 3,
+        "class": "humans",
+        "description": "A brave human has sacrificed themselves in battle to help the dwarves, causing a loss to the Human Kingdom but a gain to the Dwarven Kingdom.",
+        "elves": 0,
+        "dwarves": 20,
+        "humans": -20
+    },
+    "hum3_vE-2": {
+        "name": "War Victory",
+        "epoch": 3,
+        "class": "humans",
+        "description": "The humans have won a great, long lasting war against the elves, bringing glory to the Human Kingdom and causing a heavy loss to the Elven Kingdom.",
+        "elves": -20,
+        "dwarves": 0,
+        "humans": 20
+    },
+    "hum3_tb": {
+        "name": "A Costly Blessing",
+        "epoch": 3,
+        "class": "humans",
+        "description": "Humans suffer a great loss in an event that benefits both the elves and the dwarves.",
+        "elves": 10,
+        "dwarves": 10,
+        "humans": -20
+    },
+    "hum3_cq": {
+        "name": "Conquest on Two Fronts",
+        "epoch": 3,
+        "class": "humans",
+        "description": "The humans have plundered both the elves and the dwarves in a wide-ranging campaign, growing stronger while draining both kingdoms.",
+        "elves": -10,
+        "dwarves": -10,
+        "humans": 20
     }
 }
+

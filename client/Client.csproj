@@ -1,4 +1,4 @@
-<Project Sdk="Godot.NET.Sdk/4.7.2">
+<Project Sdk="Godot.NET.Sdk/4.7.1">
   <ItemGroup>
     <ProjectReference Include="..\common\common_cs\common_cs.csproj" />
   </ItemGroup>

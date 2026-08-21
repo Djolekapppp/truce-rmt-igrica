@@ -57,9 +57,13 @@ pub enum Message {
         seed: u64,
         turn: u32,
         epoch: u32,
-        nature: i32,
-        faith: i32,
-        science: i32,
+        elves: i32,
+        dwarves: i32,
+        humans: i32,
+    },
+    Modifier {
+        modifier: String,
+        value: f32,
     },
     GameOver,
     Response {

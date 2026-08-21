@@ -10,34 +10,70 @@ static CARDS: LazyLock<HashMap<String, Card>> = LazyLock::new(|| {
     load_cards()
 });
 
+const MODIFIERS: [&str; 3] = ["agitated", "skeptical", "hyped"];
+const MODIFIER_VALUES: [f32; 3] = [1.10, 0.8, 1.3];
+
 struct GameState {
     seed: u64,
     turn: u32,
     epoch: u32,
-    nature: i32,
-    faith: i32,
-    science: i32,
+    elves: i32,
+    dwarves: i32,
+    humans: i32,
 }
 
 impl GameState {
-    fn update(&mut self, card: String) -> Result<(), String> {
-        if let Some(card) = CARDS.get(&card) {
-            self.nature += card.nature;
-            self.faith += card.faith;
-            self.science += card.science;
-            self.turn += 1;
-            self.epoch = (self.turn-1) / 2 + 1;
-            Ok(())
-        } else {
-            Err(format!("Card {} not found", card))
+    fn modify_value(value: i32, modifier: &str) -> i32 {
+        match modifier {
+            "agitated" if value < 0 => (value as f32 * MODIFIER_VALUES[0]).round() as i32,
+            "skeptical" if value > 0 => (value as f32 * MODIFIER_VALUES[1]).round() as i32,
+            "hyped" => (value as f32 * MODIFIER_VALUES[2]).round() as i32,
+            "" | "none" => value,
+            "agitated" | "skeptical" => value,
+            _ => value,
         }
+    }
+
+    /// Applies all three players' cards as one atomic round.
+    /// `turn` counts completed rounds, not individual card messages.
+    fn apply_round(&mut self, cards: [(String, String); 3]) -> Result<(), String> {
+        let mut total_elves = 0;
+        let mut total_dwarves = 0;
+        let mut total_humans = 0;
+
+        for (card_name, modifier) in cards {
+            let card = CARDS
+                .get(&card_name)
+                .ok_or_else(|| format!("Card {} not found", card_name))?;
+
+            total_elves += Self::modify_value(card.elves, &modifier);
+            total_dwarves += Self::modify_value(card.dwarves, &modifier);
+            total_humans += Self::modify_value(card.humans, &modifier);
+        }
+
+        self.elves += total_elves;
+        self.dwarves += total_dwarves;
+        self.humans += total_humans;
+
+        // One turn = one completed round = all three players have played.
+        self.turn += 1;
+
+        // Two rounds per epoch:
+        // turn 1-2 -> epoch 1
+        // turn 3-4 -> epoch 2
+        // turn 5-6 -> epoch 3
+        // turn 7-8 -> epoch 4 (stage 2)
+        self.epoch = (self.turn - 1) / 2 + 1;
+
+        Ok(())
     }
 
     fn get_hand(&self, class: String, exclude: &[String]) -> Vec<String> {
         let mut deck: Vec<&String> = CARDS.iter()
             .filter(|(key, card)| *card.class == class
                 && !exclude.contains(key)
-                && card.epoch == self.epoch) 
+                && (card.epoch == self.epoch ||
+                   card.epoch + 3 == self.epoch))
                
             .map(|(key, _)| key).collect();
 
@@ -47,7 +83,7 @@ impl GameState {
     }
 
     fn is_lost(&self) -> bool {
-        if self.nature < 0 || self.faith < 0 || self.science < 0 {
+        if self.elves <= 0 || self.dwarves <= 0 || self.humans <= 0 {
             true
         } else {
             false
@@ -57,8 +93,11 @@ impl GameState {
 
 pub struct Room {
     id: u32,
-    players: [Option<Player>; 3], 
+    players: [Option<Player>; 3],
     game: GameState,
+    // One selected card per player for the current round.
+    // The game-state changes only after all three players have selected.
+    pending_cards: [Option<(String, String)>; 3],
 }
 
 impl Room {
@@ -81,6 +120,7 @@ pub struct Player {
     pub id: u32, 
     pub username: String,
     pub class: String,
+    pub modifier: String,
     pub hand: Vec<String>,
     pub ready: bool,
 }
@@ -209,18 +249,24 @@ impl RoomManager {
                                         seed: actual_seed,
                                         turn: 1,
                                         epoch: 1,
-                                        nature: 10,
-                                        faith: 10,
-                                        science: 10,
+                                        elves: 40,
+                                        dwarves: 40,
+                                        humans: 40,
                                     };
+                                    room.pending_cards = [None, None, None];
+
+                                    // Stage 1 starts without modifiers.
+                                    for player in room.players.iter_mut().flatten() {
+                                        player.modifier.clear();
+                                    }
 
                                     common::Message::GameState {
                                         seed: actual_seed,
                                         turn: room.game.turn,
                                         epoch: room.game.epoch,
-                                        nature: room.game.nature,
-                                        faith: room.game.faith,
-                                        science: room.game.science,
+                                        elves: room.game.elves,
+                                        dwarves: room.game.dwarves,
+                                        humans: room.game.humans,
                                     }
                                 } else {
                                     self.send_to_player(player_id, 
@@ -243,54 +289,145 @@ impl RoomManager {
                     } 
                 }
                 common::Message::Card { name } => {
-                    if let Some(room_id) = self.player_room.get(&player_id) {
-                        let game_state_message = {
-                            if let Some(room) = self.rooms.get_mut(room_id) {
-                                match room.game.update(name) {
-                                    Ok(_) => {
-                                        common::Message::GameState {
-                                            seed: room.game.seed,
-                                            turn: room.game.turn,
-                                            epoch: room.game.epoch,
-                                            nature: room.game.nature,
-                                            faith: room.game.faith,
-                                            science: room.game.science,
-                                        }
-                                    }
-                                    Err(err) => {
-                                        self.send_to_player(player_id, 
-                                            common::Message::Error {
-                                                message: err,
-                                            }).await;
-                                        continue;
+                    let Some(room_id) = self.player_room.get(&player_id).copied() else {
+                        self.send_to_player(player_id, common::Message::Error {
+                            message: "Game has not started yet".to_string(),
+                        }).await;
+                        continue;
+                    };
+
+                    // Find the player's slot. Slot 0/1/2 corresponds to the three
+                    // cooperative players/classes in the room.
+                    let player_index = match self.rooms.get(&room_id).and_then(|room| {
+                        room.players.iter().position(|p| p.as_ref().map(|p| p.id) == Some(player_id))
+                    }) {
+                        Some(index) => index,
+                        None => {
+                            self.send_to_player(player_id, common::Message::Error {
+                                message: "Player is not in the room".to_string(),
+                            }).await;
+                            continue;
+                        }
+                    };
+
+                    // Ensure stage-2 modifiers exist before any stage-2 card can be played.
+                    if self.stage_two_started(room_id) {
+                        let modifiers_missing = self.rooms
+                            .get(&room_id)
+                            .map(|room| room.players.iter().flatten().any(|p| p.modifier.is_empty()))
+                            .unwrap_or(false);
+
+                        if modifiers_missing {
+                            match self.assign_stage_two_modifiers(room_id) {
+                                Ok(assignments) => {
+                                    for (target_id, modifier) in assignments {
+                                        let index = MODIFIERS.iter().position(|&m| m == modifier).unwrap_or(0);
+                                        self.send_to_player(
+                                            target_id,
+                                            common::Message::Modifier { 
+                                            modifier: modifier.clone(),
+                                            value: MODIFIER_VALUES[index] },
+                                        ).await;
                                     }
                                 }
-
-                            } else {
-                                self.send_to_player(player_id, 
-                                    common::Message::Error {
-                                        message: "Room not found".to_string(),
-                                    }).await;
-                                continue;
-                            }
-                        };
-                        if let Some(room) = self.rooms.get_mut(room_id) {
-                            if room.game.is_lost() {
-                                self.broadcast_to_room(*room_id, 
-                                    common::Message::GameOver).await;
+                                Err(err) => {
+                                    self.send_to_player(player_id, common::Message::Error { message: err }).await;
+                                    continue;
+                                }
                             }
                         }
+                    }
 
-                        self.broadcast_to_room(*room_id, 
-                            game_state_message).await;
-
-                        self.send_hands(*room_id).await;
-
-                    } else {
-                        self.send_to_player(player_id, 
-                            common::Message::Error {
-                                message: "Game has not started yet".to_string(),
+                    let result = {
+                        let Some(room) = self.rooms.get_mut(&room_id) else {
+                            self.send_to_player(player_id, common::Message::Error {
+                                message: "Room not found".to_string(),
                             }).await;
+                            continue;
+                        };
+
+                        // A player can only submit once per round.
+                        if room.pending_cards[player_index].is_some() {
+                            Err("You already selected a card for this round".to_string())
+                        } else {
+                            let modifier = room.players[player_index]
+                                .as_ref()
+                                .map(|p| p.modifier.clone())
+                                .unwrap_or_default();
+
+                            room.pending_cards[player_index] = Some((name, modifier));
+
+                            // Do not update the game until all three players have selected.
+                            if room.pending_cards.iter().all(|card| card.is_some()) {
+                                let cards = [
+                                    room.pending_cards[0].take().unwrap(),
+                                    room.pending_cards[1].take().unwrap(),
+                                    room.pending_cards[2].take().unwrap(),
+                                ];
+
+                                let was_stage_two = room.game.epoch >= 4;
+                                let update_result = room.game.apply_round(cards);
+
+                                match update_result {
+                                    Ok(()) => {
+                                        let starts_stage_two = !was_stage_two && room.game.epoch >= 4;
+                                        Ok(Some((
+                                            common::Message::GameState {
+                                                seed: room.game.seed,
+                                                turn: room.game.turn,
+                                                epoch: room.game.epoch,
+                                                elves: room.game.elves,
+                                                dwarves: room.game.dwarves,
+                                                humans: room.game.humans,
+                                            },
+                                            starts_stage_two,
+                                        )))
+                                    }
+                                    Err(err) => Err(err),
+                                }
+                            } else {
+                                Ok(None)
+                            }
+                        }
+                    };
+
+                    match result {
+                        Ok(Some((game_state_message, starts_stage_two))) => {
+                            if let Some(room) = self.rooms.get(&room_id) {
+                                if room.game.is_lost() {
+                                    self.broadcast_to_room(room_id, common::Message::GameOver).await;
+                                }
+                            }
+
+                            self.broadcast_to_room(room_id, game_state_message).await;
+
+                            // Modifiers are assigned exactly when stage 2 begins.
+                            // Each player is told their own modifier privately.
+                            if starts_stage_two {
+                                if let Ok(assignments) = self.assign_stage_two_modifiers(room_id) {
+                                    for (target_id, modifier) in assignments {
+                                        let index = MODIFIERS.iter().position(|&m| m == modifier).unwrap_or(0);
+                                        self.send_to_player(
+                                            target_id,
+                                            common::Message::Modifier {
+                                                modifier: modifier.clone(),
+                                                value: MODIFIER_VALUES[index],
+                                            },
+                                        ).await;
+                                    }
+                                }
+                            }
+
+                            self.send_hands(room_id).await;
+                        }
+                        Ok(None) => {
+                            // The card is locked in, but the state does not change yet.
+                        }
+                        Err(err) => {
+                            self.send_to_player(player_id, common::Message::Error {
+                                message: err,
+                            }).await;
+                        }
                     }
                 }
 
@@ -314,6 +451,26 @@ impl RoomManager {
                 _ => {}
             }
         }
+    }
+
+    fn assign_stage_two_modifiers(&mut self, room_id: u32) -> Result<Vec<(u32, String)>, String> {
+        let room = self.rooms.get_mut(&room_id)
+            .ok_or_else(|| "Room not found".to_string())?;
+
+        let mut modifiers = MODIFIERS.to_vec();
+        modifiers.shuffle(&mut StdRng::seed_from_u64(room.game.seed));
+
+        let mut assignments = Vec::new();
+        for (player, modifier) in room.players.iter_mut().flatten().zip(modifiers.into_iter()) {
+            player.modifier = modifier.to_string();
+            assignments.push((player.id, player.modifier.clone()));
+        }
+
+        Ok(assignments)
+    }
+
+    fn stage_two_started(&self, room_id: u32) -> bool {
+        self.rooms.get(&room_id).map_or(false, |room| room.game.epoch >= 4)
     }
 
     async fn send_to_player(&self, client_id: u32, message: common::Message) {
@@ -347,9 +504,9 @@ impl RoomManager {
             seed: rand::random(),
             turn: 0,
             epoch: 0,
-            nature: 0,
-            faith: 0,
-            science: 0,
+            elves: 0,
+            dwarves: 0,
+            humans: 0,
         };
         let player = self.players.get(&player_id).ok_or_else(|| format!("Player {} not found", player_id))?.clone();
 
@@ -357,6 +514,7 @@ impl RoomManager {
             id: room_id,
             players: [Some(player), None, None],
             game: game_state,
+            pending_cards: [None, None, None],
         };
         self.rooms.insert(room_id, room);
         self.player_room.insert(player_id, room_id);
@@ -403,6 +561,7 @@ impl RoomManager {
             player.class = String::new();
             player.ready = false;
             player.hand = vec![String::new(), String::new()];
+            player.modifier = String::new();
         }
 
         self.remove_empty_room(room_id);
@@ -507,6 +666,7 @@ impl RoomManager {
             username: username,
             class: "".to_string(),
             hand: vec!["".to_string(),"".to_string()],
+            modifier: "".to_string(),
             ready: false,
         };
         self.players.insert(player_id, player);
@@ -554,3 +714,4 @@ impl RoomManager {
         }
     }
 }
+
