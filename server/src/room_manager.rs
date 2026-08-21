@@ -113,6 +113,8 @@ impl RoomManager {
                     println!("Player {} connected with username: {}", player_id, username);
                     self.create_player(player_id, username.clone());
                     self.send_to_player(player_id,
+                        common::Message::Welcome { player_id }).await;
+                    self.send_to_player(player_id,
                         common::Message::Response 
                         { content: format!("Welcome, {}!", username) }).await;
                 }
@@ -120,10 +122,12 @@ impl RoomManager {
                     match self.create_room(next_room_id, player_id) {
                         Ok(_) => {
                             next_room_id += 1;
+                            let room_id = next_room_id - 1;
                             self.send_to_player(player_id, 
                                 common::Message::Response {
-                                    content: format!("Room {} created", next_room_id - 1),
+                                    content: format!("Room {} created", room_id),
                                 }).await;
+                            self.broadcast_lobby_state(room_id).await;
                         }
                         Err(err) => {
                             self.send_to_player(player_id, 
@@ -140,6 +144,7 @@ impl RoomManager {
                                 common::Message::Response {
                                     content: format!("Player {} joined room {}", player_id, room_id),
                                 }).await;
+                            self.broadcast_lobby_state(room_id).await;
                         }
                         Err(err) => {
                             self.send_to_player(player_id, 
@@ -151,11 +156,12 @@ impl RoomManager {
                 }
                 common::Message::LeaveRoom => {
                     match self.leave_room(player_id) {
-                        Ok(_) => {
+                        Ok(room_id) => {
                             self.send_to_player(player_id, 
                                 common::Message::Response {
                                     content: "Left the room".to_string(),
                                 }).await;
+                            self.broadcast_lobby_state(room_id).await;
                         }
                         Err(err) => {
                             self.send_to_player(player_id, 
@@ -166,45 +172,27 @@ impl RoomManager {
                     }
                 }
                 common::Message::Ready { class } => {
-                    if let Some(room_id) = self.player_room.get(&player_id) {
-                        let mut taken: bool = false;
-                        if let Some(room) = self.rooms.get_mut(room_id) {
-                            for player in room.players.iter_mut().flatten() {
-                                if player.class == class {
-                                    taken = true;
-                                    continue;
-                                }
-                            }
+                    match self.set_ready(player_id, class) {
+                        Ok(room_id) => {
+                            self.broadcast_lobby_state(room_id).await;
                         }
-                        if !taken {
-                            if let Some(player) = self.players.get_mut(&player_id) {
-                                player.class = class.clone();
-                                player.ready = true;
-                                self.broadcast_to_room(*room_id, 
-                                    common::Message::Response {
-                                        content: format!("Player {} is ready", player_id),
-                                    }).await;
-                            }
-                        } else {
+                        Err(err) => {
                             self.send_to_player(player_id, 
                                 common::Message::Error {
-                                    message: format!("Class {} is already taken", class),
+                                    message: err,
                                 }).await;
                         }
-                    } else {
-                        self.send_to_player(player_id, 
-                            common::Message::Error {
-                                message: "You are not in a room".to_string(),
-                            }).await;
                     }
                 }
                 common::Message::Unready => {
-                    if let Some(room_id) = self.player_room.get(&player_id) {
-                        if let Some(player) = self.players.get_mut(&player_id) {
-                            player.ready = false;
-                            self.broadcast_to_room(*room_id, 
-                                common::Message::Response {
-                                    content: format!("Player {} is not ready", player_id),
+                    match self.set_unready(player_id) {
+                        Ok(room_id) => {
+                            self.broadcast_lobby_state(room_id).await;
+                        }
+                        Err(err) => {
+                            self.send_to_player(player_id, 
+                                common::Message::Error {
+                                    message: err,
                                 }).await;
                         }
                     }
@@ -307,7 +295,21 @@ impl RoomManager {
                 }
 
                 common::Message::Chat { content } => {
-                    todo!("Implement chat logic");
+                    if let Some(room_id) = self.player_room.get(&player_id).copied() {
+                        let username = self.players.get(&player_id)
+                            .map(|p| p.username.clone())
+                            .unwrap_or_else(|| format!("Player {}", player_id));
+
+                        self.broadcast_to_room(room_id, 
+                            common::Message::Chat {
+                                content: format!("{}: {}", username, content),
+                            }).await;
+                    } else {
+                        self.send_to_player(player_id, 
+                            common::Message::Error {
+                                message: "You are not in a room".to_string(),
+                            }).await;
+                    }
                 }
                 _ => {}
             }
@@ -370,6 +372,7 @@ impl RoomManager {
         if let Some(room) = self.get_room(room_id) {
             if let Some(slot) = room.players.iter_mut().find(|slot| slot.is_none()) {
                 *slot = Some(player);
+                self.player_room.insert(player_id, room_id);
                 Ok(())
             } else {
                 Err("Room is full".to_string())
@@ -379,7 +382,7 @@ impl RoomManager {
         }
     }
 
-    fn leave_room(&mut self, player_id: u32) -> Result<(), String> {
+    fn leave_room(&mut self, player_id: u32) -> Result<u32, String> {
         let room_id = match self.player_room.get(&player_id) {
             Some(&room_id) => room_id,
             None => return Err("Player is not in any room".to_string()),
@@ -395,8 +398,99 @@ impl RoomManager {
         } else {
             return Err("Room not found".to_string());
         }
+
+        if let Some(player) = self.players.get_mut(&player_id) {
+            player.class = String::new();
+            player.ready = false;
+            player.hand = vec![String::new(), String::new()];
+        }
+
         self.remove_empty_room(room_id);
-        Ok(())
+        Ok(room_id)
+    }
+
+    /// Postavlja klasu i spremnost igraca.
+    ///
+    /// Vazno: izvor istine za lobi je `room.players`, jer `Room::is_ready`
+    /// i `send_hands` citaju odatle. Ranije se azurirao samo `self.players`,
+    /// pa je `is_ready()` uvek vracao false i StartGame nikad nije prolazio.
+    fn set_ready(&mut self, player_id: u32, class: String) -> Result<u32, String> {
+        let class = class.trim().to_lowercase();
+
+        if !common::is_valid_class(&class) {
+            return Err(format!("Unknown class: {}", class));
+        }
+
+        let room_id = self.player_room.get(&player_id).copied()
+            .ok_or_else(|| "You are not in a room".to_string())?;
+
+        let room = self.rooms.get_mut(&room_id)
+            .ok_or_else(|| "Room not found".to_string())?;
+
+        let taken = room.players.iter().flatten()
+            .any(|p| p.id != player_id && p.class == class);
+
+        if taken {
+            return Err(format!("Class {} is already taken", class));
+        }
+
+        let slot = room.players.iter_mut().flatten()
+            .find(|p| p.id == player_id)
+            .ok_or_else(|| "Player not found in the room".to_string())?;
+
+        slot.class = class.clone();
+        slot.ready = true;
+
+        if let Some(player) = self.players.get_mut(&player_id) {
+            player.class = class;
+            player.ready = true;
+        }
+
+        Ok(room_id)
+    }
+
+    fn set_unready(&mut self, player_id: u32) -> Result<u32, String> {
+        let room_id = self.player_room.get(&player_id).copied()
+            .ok_or_else(|| "You are not in a room".to_string())?;
+
+        let room = self.rooms.get_mut(&room_id)
+            .ok_or_else(|| "Room not found".to_string())?;
+
+        let slot = room.players.iter_mut().flatten()
+            .find(|p| p.id == player_id)
+            .ok_or_else(|| "Player not found in the room".to_string())?;
+
+        slot.class = String::new();
+        slot.ready = false;
+
+        if let Some(player) = self.players.get_mut(&player_id) {
+            player.class = String::new();
+            player.ready = false;
+        }
+
+        Ok(room_id)
+    }
+
+    /// Snimak lobija koji klijent koristi da iscrta slotove igraca.
+    fn lobby_state(&self, room_id: u32) -> Option<common::Message> {
+        let room = self.rooms.get(&room_id)?;
+
+        let players = room.players.iter().flatten()
+            .map(|p| common::LobbyPlayer {
+                id: p.id,
+                username: p.username.clone(),
+                class: p.class.clone(),
+                ready: p.ready,
+            })
+            .collect();
+
+        Some(common::Message::LobbyState { room_id, players })
+    }
+
+    async fn broadcast_lobby_state(&self, room_id: u32) {
+        if let Some(message) = self.lobby_state(room_id) {
+            self.broadcast_to_room(room_id, message).await;
+        }
     }
 
     fn remove_empty_room(&mut self, room_id: u32) {

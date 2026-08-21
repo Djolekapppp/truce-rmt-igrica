@@ -27,6 +27,59 @@ public class ConnectMessageData {
 
 
 [MessagePackObject]
+public class WelcomeMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "Welcome";
+
+    [Key("payload")]
+    public WelcomeData Data { get; set; } = new();
+}
+
+[MessagePackObject]
+public class WelcomeData
+{
+    [Key("player_id")]
+    public uint PlayerId { get; set; }
+}
+
+[MessagePackObject]
+public class LobbyStateMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "LobbyState";
+
+    [Key("payload")]
+    public LobbyStateData Data { get; set; } = new();
+}
+
+[MessagePackObject]
+public class LobbyStateData
+{
+    [Key("room_id")]
+    public uint RoomId { get; set; }
+
+    [Key("players")]
+    public List<LobbyPlayer> Players { get; set; } = new();
+}
+
+[MessagePackObject]
+public class LobbyPlayer
+{
+    [Key("id")]
+    public uint Id { get; set; }
+
+    [Key("username")]
+    public string Username { get; set; } = "";
+
+    [Key("class")]
+    public string Class { get; set; } = "";
+
+    [Key("ready")]
+    public bool Ready { get; set; }
+}
+
+[MessagePackObject]
 public class CreateRoomMessage : IGameMessage
 {
     [Key("kind")]
@@ -86,8 +139,8 @@ public class ReadyMessage : IGameMessage
 [MessagePackObject]
 public class ReadyData
 {
-    [Key("is_ready")]
-    public String Class { get; set; } = "";
+    [Key("class")]
+    public string Class { get; set; } = "";
 }
 
 [MessagePackObject]
@@ -152,7 +205,7 @@ public class StartGameMessage : IGameMessage
 public class StartGameData
 {
     [Key("seed")]
-    public long Seed { get; set; }
+    public ulong Seed { get; set; }
 }
 
 [MessagePackObject]
@@ -169,7 +222,7 @@ public class GameStateMessage : IGameMessage
 public class GameStateData
 {
     [Key("seed")]
-    public uint Seed { get; set; } = 0;
+    public ulong Seed { get; set; } = 0;
 
     [Key("turn")]
     public uint Turn { get; set; } = 0;
@@ -262,7 +315,12 @@ public class GameMessageFormatter : IMessagePackFormatter<IGameMessage>
         return kind switch
         {
             "Connect" => MessagePackSerializer.Deserialize<ConnectMessage>(ref reader, options),
+            "Welcome" => MessagePackSerializer.Deserialize<WelcomeMessage>(ref reader, options),
             "CreateRoom" => MessagePackSerializer.Deserialize<CreateRoomMessage>(ref reader, options),
+            "LobbyState" => MessagePackSerializer.Deserialize<LobbyStateMessage>(ref reader, options),
+            "Ready" => MessagePackSerializer.Deserialize<ReadyMessage>(ref reader, options),
+            "Unready" => MessagePackSerializer.Deserialize<UnreadyMessage>(ref reader, options),
+            "GameOver" => MessagePackSerializer.Deserialize<GameOverMessage>(ref reader, options),
             "LeaveRoom" => MessagePackSerializer.Deserialize<LeaveRoomMessage>(ref reader, options),
             "JoinRoom" => MessagePackSerializer.Deserialize<JoinRoomMessage>(ref reader, options),
             "Card" => MessagePackSerializer.Deserialize<CardMessage>(ref reader, options),

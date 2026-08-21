@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="Client"
-run/main_scene="res://scenes/control.tscn"
+run/main_scene="res://scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+GameNet="*res://scripts/GameNet.cs"
 
 [display]
 

@@ -1,46 +1,80 @@
-
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Godot;
 
-public class Card
-{
-    //Ovde moze da ide i slika ili tako neš
+/// <summary>
+/// Jedna karta, ista struktura kao unos u data/cards.json.
+/// </summary>
+public class Card {
+    [JsonPropertyName("name")]
     public string Name { get; set; } = "";
-    public string Class { get; set; } = "";
-    public string Description { get; set; } = "";
-    public int Nature { get; set; } = 0;
-    public int Faith { get; set; } = 0;
-    public int Science { get; set; } = 0;
 
+    [JsonPropertyName("epoch")]
+    public int Epoch { get; set; }
+
+    [JsonPropertyName("class")]
+    public string Class { get; set; } = "";
+
+    [JsonPropertyName("description")]
+    public string Description { get; set; } = "";
+
+    [JsonPropertyName("nature")]
+    public int Nature { get; set; }
+
+    [JsonPropertyName("faith")]
+    public int Faith { get; set; }
+
+    [JsonPropertyName("science")]
+    public int Science { get; set; }
 }
 
-public class CardDatabase
-{
-    public Dictionary<string, Card> Cards { get; set; } = new();
+/// <summary>
+/// Lokalna kopija spila, samo za prikaz. Server salje kljuceve karata
+/// ("Card 1"), a ovde ih prevodimo u ime, opis i efekte.
+///
+/// data/cards.json mora da ostane identican serverskom src/cards/cards.json.
+/// </summary>
+public static class CardDatabase {
+    private const string CardsPath = "res://data/cards.json";
 
-    public void LoadCards()
-    {
-        string json = System.IO.File.ReadAllText("../data/cards.json");
+    private static Dictionary<string, Card> _cards;
 
-        var cardList = JsonSerializer.Deserialize<List<Card>>(json);
-        if (cardList != null)
-        {
-            foreach (var card in cardList)
-            {
-                Cards[card.Name] = card;
-            }
+    public static IReadOnlyDictionary<string, Card> Cards {
+        get {
+            EnsureLoaded();
+            return _cards;
         }
     }
 
-    public Card GetCard(string name)
-    {
-        if (Cards.TryGetValue(name, out var card))
-        {
-            return card;
+    /// <summary>Vraca null ako karta ne postoji, umesto da baca izuzetak.</summary>
+    public static Card Get(string key) {
+        EnsureLoaded();
+        return _cards.TryGetValue(key, out var card) ? card : null;
+    }
+
+    private static void EnsureLoaded() {
+        if (_cards != null) {
+            return;
         }
-        else
-        {
-            throw new KeyNotFoundException($"Card with name '{name}' not found.");
+
+        _cards = new Dictionary<string, Card>();
+
+        using var file = FileAccess.Open(CardsPath, FileAccess.ModeFlags.Read);
+
+        if (file == null) {
+            GD.PushError($"Ne mogu da otvorim {CardsPath}: {FileAccess.GetOpenError()}");
+            return;
+        }
+
+        try {
+            var parsed = JsonSerializer.Deserialize<Dictionary<string, Card>>(file.GetAsText());
+
+            if (parsed != null) {
+                _cards = parsed;
+            }
+        } catch (JsonException ex) {
+            GD.PushError($"{CardsPath} nije validan JSON: {ex.Message}");
         }
     }
 }

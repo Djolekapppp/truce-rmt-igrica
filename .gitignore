@@ -14,3 +14,6 @@ common/common_rust/target/
 
 # Linux
 *~
+
+# Godot backup pri podizanju SDK-a
+*.csproj.old

@@ -1,63 +1,56 @@
 {
-    "Card 1" : 
-    {
-        "name":"Karta1",
+    "Card 1": {
+        "name": "Karta1",
         "epoch": 1,
-        "class":"red",
-        "description":"Eine Karte",
-        "nature":0,
-        "faith":0,
-        "science":3
+        "class": "dwarves",
+        "description": "Eine Karte",
+        "nature": 0,
+        "faith": 0,
+        "science": 3
     },
-    "Card 2" :
-    {
-        "name":"Karta2",
+    "Card 2": {
+        "name": "Karta2",
         "epoch": 1,
-        "class":"blue",
-        "description":"Eine Karte2",
-        "nature":0,
-        "faith":3,
-        "science":0
-    }
-    "Card 3" :
-    {
-        "name":"Karta3",
-        "epoch": 1,
-        "class":"green",
-        "description":"Eine Karte3",
-        "nature":3,
-        "faith":0,
-        "science":0
-    }
-    "Card 4" : 
-    {
-        "name":"Karta4",
-        "epoch": 2,
-        "class":"red",
-        "description":"Eine Karte4",
-        "nature":-2,
-        "faith":-2,
-        "science":6
+        "class": "humans",
+        "description": "Eine Karte2",
+        "nature": 0,
+        "faith": 3,
+        "science": 0
     },
-    "Card 5" :
-    {
-        "name":"Karta5",
+    "Card 3": {
+        "name": "Karta3",
+        "epoch": 1,
+        "class": "elves",
+        "description": "Eine Karte3",
+        "nature": 3,
+        "faith": 0,
+        "science": 0
+    },
+    "Card 4": {
+        "name": "Karta4",
         "epoch": 2,
-        "class":"blue",
-        "description":"Eine Karte6",
-        "nature":-2,
-        "faith":6,
-        "science":-2
-    }
-    "Card 6" :
-    {
-        "name":"Karta6",
+        "class": "dwarves",
+        "description": "Eine Karte4",
+        "nature": -2,
+        "faith": -2,
+        "science": 6
+    },
+    "Card 5": {
+        "name": "Karta5",
         "epoch": 2,
-        "class":"green",
-        "description":"Eine Karte6",
-        "nature":6,
-        "faith":-2,
-        "science":-2
+        "class": "humans",
+        "description": "Eine Karte5",
+        "nature": -2,
+        "faith": 6,
+        "science": -2
+    },
+    "Card 6": {
+        "name": "Karta6",
+        "epoch": 2,
+        "class": "elves",
+        "description": "Eine Karte6",
+        "nature": 6,
+        "faith": -2,
+        "science": -2
     }
 }
-
