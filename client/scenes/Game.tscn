@@ -146,34 +146,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = ""
 
-[node name="EndRow" type="HBoxContainer" parent="Margin/VBox"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="PlayAgainButton" type="Button" parent="Margin/VBox/EndRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 44)
-layout_mode = 2
-text = "Igraj ponovo"
-
-[node name="ExitButton" type="Button" parent="Margin/VBox/EndRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(140, 44)
-layout_mode = 2
-text = "Izađi"
-
-[node name="EndHint" type="Label" parent="Margin/VBox/EndRow"]
-unique_name_in_owner = true
-modulate = Color(1, 1, 1, 0.55)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 12
-text = ""
-vertical_alignment = 1
-autowrap_mode = 3
-
 [node name="HandScroll" type="ScrollContainer" parent="Margin/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -286,3 +258,93 @@ size_flags_horizontal = 3
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
 columns = 4
+
+[node name="EndOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="EndOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.03, 0.05, 0.88)
+
+[node name="Center" type="CenterContainer" parent="EndOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="EndOverlay/Center"]
+custom_minimum_size = Vector2(680, 0)
+layout_mode = 2
+
+[node name="EndMargin" type="MarginContainer" parent="EndOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 44
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 44
+
+[node name="EndBox" type="VBoxContainer" parent="EndOverlay/Center/Panel/EndMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ResultTitle" type="Label" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 52
+text = ""
+horizontal_alignment = 1
+
+[node name="ResultText" type="Label" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.78)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ScoreRow" type="HBoxContainer" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 36
+
+[node name="EndSep" type="HSeparator" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+layout_mode = 2
+
+[node name="PlayAgainButton" type="Button" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Igraj ponovo"
+
+[node name="ExitButton" type="Button" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Izađi"
+
+[node name="EndHint" type="Label" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.5)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3

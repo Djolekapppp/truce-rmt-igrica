@@ -34,7 +34,10 @@ public partial class Game : Control {
 
     private LineEdit _chatEdit;
     private Button _chatSend;
-    private HBoxContainer _endRow;
+    private Control _endOverlay;
+    private Label _resultTitle;
+    private Label _resultText;
+    private HBoxContainer _scoreRow;
     private Button _playAgainButton;
     private Button _exitButton;
     private Label _endHint;
@@ -75,7 +78,10 @@ public partial class Game : Control {
 
         _chatEdit = GetNode<LineEdit>("%ChatEdit");
         _chatSend = GetNode<Button>("%ChatSend");
-        _endRow = GetNode<HBoxContainer>("%EndRow");
+        _endOverlay = GetNode<Control>("%EndOverlay");
+        _resultTitle = GetNode<Label>("%ResultTitle");
+        _resultText = GetNode<Label>("%ResultText");
+        _scoreRow = GetNode<HBoxContainer>("%ScoreRow");
         _playAgainButton = GetNode<Button>("%PlayAgainButton");
         _exitButton = GetNode<Button>("%ExitButton");
         _endHint = GetNode<Label>("%EndHint");
@@ -539,22 +545,78 @@ public partial class Game : Control {
 
     private void OnGameOver(GameOverData data) {
         _gameOver = true;
-        _endRow.Visible = true;
-        _endHint.Text = "Igraj ponovo vraća celu ekipu u lobi, gde ponovo birate rase. "
-            + "Izađi te vraća na početni ekran.";
 
         foreach (var button in _playButtons) {
             button.Disabled = true;
         }
 
-        if (data.Won) {
-            _hintLabel.Text = "Mir je održan kroz svih šest epoha.";
+        _deckOverlay.Visible = false;
+        ShowEndScreen(data.Won);
+    }
+
+    /// <summary>
+    /// Kraj partije ide preko celog ekrana: ishod u prvom planu, konacno
+    /// zadovoljstvo sve tri rase, pa dva krupna dugmeta ispod.
+    /// </summary>
+    private void ShowEndScreen(bool won) {
+        var state = Net.GameState;
+
+        if (won) {
+            _resultTitle.Text = "POBEDA";
+            _resultTitle.Modulate = new Color(0.45f, 0.88f, 0.5f);
+            _resultText.Text = "Mir je održan kroz svih šest epoha. "
+                + "Nijedna rasa nije izgubila poverenje u svoje saveznike.";
+            _hintLabel.Text = "Mir je održan.";
             _log.AppendText("[color=#6ee06e]Pobeda - izdržali ste svih šest epoha.[/color]\n");
         } else {
+            _resultTitle.Text = "PORAZ";
+            _resultTitle.Modulate = new Color(0.95f, 0.4f, 0.38f);
+            _resultText.Text = $"Rat je počeo u {state.Epoch}. epohi. "
+                + "Zadovoljstvo jedne rase je palo na nulu i mir nije održan.";
             _hintLabel.Text = "Rat je počeo. Mir nije održan.";
             _log.AppendText("[color=#ff7066]Poraz - zadovoljstvo jedne rase je palo na nulu.[/color]\n");
             _handBox.Modulate = new Color(1f, 1f, 1f, 0.4f);
         }
+
+        foreach (var child in _scoreRow.GetChildren()) {
+            _scoreRow.RemoveChild(child);
+            child.QueueFree();
+        }
+
+        _scoreRow.AddChild(BuildFinalScore(Factions.Elves, state.Elves));
+        _scoreRow.AddChild(BuildFinalScore(Factions.Dwarves, state.Dwarves));
+        _scoreRow.AddChild(BuildFinalScore(Factions.Humans, state.Humans));
+
+        _endHint.Text = "Igraj ponovo vraća celu ekipu u lobi, gde ponovo birate rase. "
+            + "Izađi te vraća na početni ekran.";
+
+        _endOverlay.Visible = true;
+        _playAgainButton.GrabFocus();
+    }
+
+    private Control BuildFinalScore(string factionId, int value) {
+        var box = new VBoxContainer();
+        box.AddThemeConstantOverride("separation", 2);
+
+        var name = new Label {
+            Text = Factions.DisplayName(factionId),
+            HorizontalAlignment = HorizontalAlignment.Center,
+        };
+        name.AddThemeFontSizeOverride("font_size", 12);
+        name.AddThemeColorOverride("font_color", Factions.Tint(factionId));
+        box.AddChild(name);
+
+        var score = new Label {
+            Text = value.ToString(),
+            HorizontalAlignment = HorizontalAlignment.Center,
+        };
+        score.AddThemeFontSizeOverride("font_size", 28);
+        score.AddThemeColorOverride("font_color", value > 0
+            ? new Color(0.9f, 0.9f, 0.94f)
+            : new Color(0.95f, 0.4f, 0.38f));
+        box.AddChild(score);
+
+        return box;
     }
 
     private void OnConnectionLost(string reason) {
