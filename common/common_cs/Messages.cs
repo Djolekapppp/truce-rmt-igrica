@@ -230,14 +230,31 @@ public class GameStateData
     [Key("epoch")]
     public uint Epoch { get; set; } = 0;
 
-    [Key("nature")]
-    public int Nature { get; set; } = 0;
+    [Key("elves")]
+    public int Elves { get; set; } = 0;
 
-    [Key("faith")]
-    public int Faith { get; set; } = 0;
+    [Key("dwarves")]
+    public int Dwarves { get; set; } = 0;
 
-    [Key("science")]
-    public int Science { get; set; } = 0;
+    [Key("humans")]
+    public int Humans { get; set; } = 0;
+}
+
+[MessagePackObject]
+public class Modifier {
+    [Key("name")]
+    public string Name { get; set; } = "";
+
+    [Key("payload")]
+    public ModifierData Data { get; set; } = new();
+}
+
+[MessagePackObject]
+public class ModifierData {
+    [Key("modifier")]
+    public string Modifier { get; set; } = "";
+    [Key("value")]
+    public float Value { get; set; } = 0;
 }
 
 [MessagePackObject]

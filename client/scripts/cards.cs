@@ -19,14 +19,14 @@ public class Card {
     [JsonPropertyName("description")]
     public string Description { get; set; } = "";
 
-    [JsonPropertyName("nature")]
-    public int Nature { get; set; }
+    [JsonPropertyName("elves")]
+    public int Elves { get; set; }
 
-    [JsonPropertyName("faith")]
-    public int Faith { get; set; }
+    [JsonPropertyName("dwarves")]
+    public int Dwarves { get; set; }
 
-    [JsonPropertyName("science")]
-    public int Science { get; set; }
+    [JsonPropertyName("humans")]
+    public int Humans { get; set; }
 }
 
 /// <summary>

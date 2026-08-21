@@ -66,9 +66,9 @@ public partial class Game : Control {
     private void OnGameState(GameStateData state) {
         _epochLabel.Text = "Epoha " + state.Epoch;
         _turnLabel.Text = "Potez " + state.Turn;
-        _natureLabel.Text = "Priroda  " + state.Nature;
-        _faithLabel.Text = "Vera  " + state.Faith;
-        _scienceLabel.Text = "Nauka  " + state.Science;
+        _natureLabel.Text = "Priroda  " + state.Elves;
+        _faithLabel.Text = "Vera  " + state.Dwarves;
+        _scienceLabel.Text = "Nauka  " + state.Humans;
 
         _factionLabel.Text = Factions.IsValid(_myFaction)
             ? Factions.DisplayName(_myFaction)
@@ -135,7 +135,7 @@ public partial class Game : Control {
 
         if (card != null) {
             box.AddChild(new Label {
-                Text = $"Priroda {Signed(card.Nature)}   Vera {Signed(card.Faith)}   Nauka {Signed(card.Science)}",
+                Text = $"Priroda {Signed(card.Elves)}   Vera {Signed(card.Dwarves)}   Nauka {Signed(card.Humans)}",
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
             });
         }
