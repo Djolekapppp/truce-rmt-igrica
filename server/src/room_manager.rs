@@ -131,6 +131,9 @@ pub struct Room {
     // One selected card per player for the current round.
     // The game-state changes only after all three players have selected.
     pending_cards: [Option<(String, String)>; 3],
+    // Partija je odigrana do kraja (poraz ili izdrzanih sest epoha).
+    // Ostaje true dok novi StartGame ne pokrene revans.
+    finished: bool,
 }
 
 impl Room {
@@ -287,10 +290,12 @@ impl RoomManager {
                                         humans: 40,
                                     };
                                     room.pending_cards = [None, None, None];
+                                    room.finished = false;
 
                                     // Stage 1 starts without modifiers.
                                     for player in room.players.iter_mut().flatten() {
                                         player.modifier.clear();
+                                        player.hand.clear();
                                     }
 
                                     common::Message::GameState {
@@ -316,8 +321,9 @@ impl RoomManager {
                                 continue;
                             }
                         };
-                        self.broadcast_to_room(*room_id, 
+                        self.broadcast_to_room(*room_id,
                             game_state_message).await;
+                        self.clear_modifiers(*room_id).await;
                         self.send_epoch_decks(*room_id).await;
                         self.send_hands(*room_id).await;
                     } 
@@ -329,6 +335,13 @@ impl RoomManager {
                         }).await;
                         continue;
                     };
+
+                    if self.rooms.get(&room_id).map_or(false, |room| room.finished) {
+                        self.send_to_player(player_id, common::Message::Error {
+                            message: "The game is over".to_string(),
+                        }).await;
+                        continue;
+                    }
 
                     // Find the player's slot. Slot 0/1/2 corresponds to the three
                     // cooperative players/classes in the room.
@@ -445,6 +458,11 @@ impl RoomManager {
                             });
 
                             if let Some(won) = outcome {
+                                if let Some(room) = self.rooms.get_mut(&room_id) {
+                                    room.finished = true;
+                                    room.pending_cards = [None, None, None];
+                                }
+
                                 self.broadcast_to_room(room_id,
                                     common::Message::GameOver { won }).await;
                                 continue;
@@ -568,6 +586,7 @@ impl RoomManager {
             players: [Some(player), None, None],
             game: game_state,
             pending_cards: [None, None, None],
+            finished: false,
         };
         self.rooms.insert(room_id, room);
         self.player_room.insert(player_id, room_id);
@@ -736,6 +755,22 @@ impl RoomManager {
 
     fn get_player_room(&self, player_id: u32) -> Option<u32> {
         self.player_room.get(&player_id).cloned()
+    }
+
+    /// Prazan modifikator znaci "nemas modifikator". Salje se na pocetku
+    /// partije da klijent ne bi zadrzao onaj iz prethodne.
+    async fn clear_modifiers(&self, room_id: u32) {
+        let player_ids: Vec<u32> = match self.rooms.get(&room_id) {
+            Some(room) => room.players.iter().flatten().map(|p| p.id).collect(),
+            None => return,
+        };
+
+        for player_id in player_ids {
+            self.send_to_player(player_id, common::Message::Modifier {
+                modifier: String::new(),
+                value: 1.0,
+            }).await;
+        }
     }
 
     /// Salje svakom igracu ceo spil iz koga mu se te epohe vuku karte,

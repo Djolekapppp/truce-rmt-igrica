@@ -32,6 +32,13 @@ public partial class Game : Control {
     private Button _deckClose;
     private GridContainer _deckGrid;
 
+    private LineEdit _chatEdit;
+    private Button _chatSend;
+    private HBoxContainer _endRow;
+    private Button _playAgainButton;
+    private Button _exitButton;
+    private Label _endHint;
+
     private readonly List<Button> _playButtons = new();
     private readonly List<PanelContainer> _epochCells = new();
 
@@ -66,6 +73,13 @@ public partial class Game : Control {
         _deckClose = GetNode<Button>("%DeckClose");
         _deckGrid = GetNode<GridContainer>("%DeckGrid");
 
+        _chatEdit = GetNode<LineEdit>("%ChatEdit");
+        _chatSend = GetNode<Button>("%ChatSend");
+        _endRow = GetNode<HBoxContainer>("%EndRow");
+        _playAgainButton = GetNode<Button>("%PlayAgainButton");
+        _exitButton = GetNode<Button>("%ExitButton");
+        _endHint = GetNode<Label>("%EndHint");
+
         var me = Net.FindMe();
         _myFaction = me != null ? me.Class : "";
         _lastTurn = Net.GameState.Turn;
@@ -74,13 +88,18 @@ public partial class Game : Control {
 
         _deckButton.Pressed += ShowDeck;
         _deckClose.Pressed += () => _deckOverlay.Visible = false;
+        _chatSend.Pressed += OnChatSend;
+        _chatEdit.TextSubmitted += _ => OnChatSend();
+        _playAgainButton.Pressed += OnPlayAgain;
+        _exitButton.Pressed += OnExit;
 
         Net.GameStateUpdated += OnGameState;
         Net.HandUpdated += OnHand;
         Net.ModifierAssigned += OnModifier;
         Net.EpochDeckUpdated += OnEpochDeck;
         Net.InfoReceived += OnInfo;
-        Net.ChatReceived += OnInfo;
+        Net.ChatReceived += OnChat;
+        Net.LobbyUpdated += OnLobbyUpdated;
         Net.ErrorReceived += OnError;
         Net.GameOverReceived += OnGameOver;
         Net.ConnectionLost += OnConnectionLost;
@@ -111,7 +130,8 @@ public partial class Game : Control {
         Net.ModifierAssigned -= OnModifier;
         Net.EpochDeckUpdated -= OnEpochDeck;
         Net.InfoReceived -= OnInfo;
-        Net.ChatReceived -= OnInfo;
+        Net.ChatReceived -= OnChat;
+        Net.LobbyUpdated -= OnLobbyUpdated;
         Net.ErrorReceived -= OnError;
         Net.GameOverReceived -= OnGameOver;
         Net.ConnectionLost -= OnConnectionLost;
@@ -223,6 +243,14 @@ public partial class Game : Control {
     }
 
     private void OnModifier(ModifierData data) {
+        // Prazan modifikator stize na pocetku partije i brise onaj iz
+        // prethodne, da revans ne bi krenuo sa starim.
+        if (data == null || string.IsNullOrEmpty(data.Modifier)) {
+            _modifierPanel.Visible = false;
+            OnHand(Net.Hand);
+            return;
+        }
+
         _modifierPanel.Visible = true;
         _modifierTitle.Text = "Tvoj modifikator: " + Modifiers.DisplayName(data.Modifier);
         _modifierTitle.AddThemeColorOverride("font_color", Modifiers.Tint(data.Modifier));
@@ -339,6 +367,8 @@ public partial class Game : Control {
 
             play.Pressed += () => {
                 Net.PlayCard(cardKey);
+                play.Text = "Odigrano ✓";
+                MarkPlayed(panel, card);
                 SetWaiting(true);
             };
 
@@ -394,6 +424,31 @@ public partial class Game : Control {
         return row;
     }
 
+    /// <summary>
+    /// Uokviruje kartu koju je igrac upravo odigrao i prigusuje ostale,
+    /// da mu bude jasno sta je poslao dok ceka saigrace.
+    /// </summary>
+    private void MarkPlayed(PanelContainer panel, Card card) {
+        var accent = card != null
+            ? Factions.Tint(card.Class)
+            : new Color(0.55f, 0.75f, 1f);
+
+        var style = new StyleBoxFlat {
+            BgColor = new Color(accent.R, accent.G, accent.B, 0.14f),
+            BorderColor = accent,
+        };
+        style.SetBorderWidthAll(3);
+        style.SetCornerRadiusAll(6);
+
+        panel.AddThemeStyleboxOverride("panel", style);
+
+        foreach (var child in _handBox.GetChildren()) {
+            if (child is Control control && control != panel) {
+                control.Modulate = new Color(1f, 1f, 1f, 0.4f);
+            }
+        }
+    }
+
     private static Color ValueTint(int value) {
         if (value > 0) {
             return new Color(0.45f, 0.85f, 0.5f);
@@ -437,12 +492,56 @@ public partial class Game : Control {
 
     // --- dogadjaji sa mreze ----------------------------------------------
 
-    private void OnInfo(string text) => _log.AppendText(text + "\n");
+    private void OnInfo(string text) => _log.AppendText(Escape(text) + "\n");
 
-    private void OnError(string text) => _log.AppendText($"[color=#ff7066]{text}[/color]\n");
+    private void OnChat(string text) =>
+        _log.AppendText($"[color=#8fd0ff]{Escape(text)}[/color]\n");
+
+    private void OnError(string text) =>
+        _log.AppendText($"[color=#ff7066]{Escape(text)}[/color]\n");
+
+    /// <summary>
+    /// Log je RichTextLabel sa ukljucenim BBCode-om, pa se uglaste zagrade
+    /// iz tudjih poruka moraju neutralisati.
+    /// </summary>
+    private static string Escape(string text) => text.Replace("[", "[lb]");
+
+    private void OnChatSend() {
+        string text = _chatEdit.Text.Trim();
+
+        if (text.Length == 0) {
+            return;
+        }
+
+        Net.SendChat(text);
+        _chatEdit.Clear();
+    }
+
+    private void OnPlayAgain() {
+        // Ponistavanje spremnosti tera server da posalje LobbyState svima,
+        // pa i ostali igraci padnu nazad u lobi (vidi OnLobbyUpdated).
+        Net.SendUnready();
+        GetTree().ChangeSceneToFile("res://scenes/Lobby.tscn");
+    }
+
+    private void OnExit() {
+        Net.LeaveRoom();
+        GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
+    }
+
+    private void OnLobbyUpdated(LobbyStateData _) {
+        // Posle kraja partije LobbyState znaci da je neko pokrenuo revans
+        // ili napustio sobu; u oba slucaja se vracamo u lobi.
+        if (_gameOver) {
+            GetTree().ChangeSceneToFile("res://scenes/Lobby.tscn");
+        }
+    }
 
     private void OnGameOver(GameOverData data) {
         _gameOver = true;
+        _endRow.Visible = true;
+        _endHint.Text = "Igraj ponovo vraća celu ekipu u lobi, gde ponovo birate rase. "
+            + "Izađi te vraća na početni ekran.";
 
         foreach (var button in _playButtons) {
             button.Disabled = true;

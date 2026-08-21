@@ -195,8 +195,12 @@ public partial class GameNet : Node {
                 break;
 
             case ModifierMessage modifier:
-                Modifier = modifier.Data;
-                ModifierAssigned?.Invoke(modifier.Data);
+                // Server salje prazan modifikator na pocetku partije, da
+                // klijent ne bi zadrzao onaj iz prethodne.
+                Modifier = string.IsNullOrEmpty(modifier.Data.Modifier)
+                    ? null
+                    : modifier.Data;
+                ModifierAssigned?.Invoke(Modifier);
                 break;
 
             case EpochDeckMessage deck:
