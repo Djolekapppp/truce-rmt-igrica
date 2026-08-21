@@ -10,9 +10,9 @@ public partial class Game : Control {
     private Label _epochLabel;
     private Label _turnLabel;
     private Label _factionLabel;
-    private Label _natureLabel;
-    private Label _faithLabel;
-    private Label _scienceLabel;
+    private Label _elfLabel;
+    private Label _dwarfLabel;
+    private Label _humanLabel;
     private Label _hintLabel;
     private HBoxContainer _handBox;
     private RichTextLabel _log;
@@ -25,9 +25,9 @@ public partial class Game : Control {
         _epochLabel = GetNode<Label>("%EpochLabel");
         _turnLabel = GetNode<Label>("%TurnLabel");
         _factionLabel = GetNode<Label>("%FactionLabel");
-        _natureLabel = GetNode<Label>("%NatureLabel");
-        _faithLabel = GetNode<Label>("%FaithLabel");
-        _scienceLabel = GetNode<Label>("%ScienceLabel");
+        _elfLabel = GetNode<Label>("%NatureLabel");
+        _dwarfLabel = GetNode<Label>("%FaithLabel");
+        _humanLabel = GetNode<Label>("%ScienceLabel");
         _hintLabel = GetNode<Label>("%HintLabel");
         _handBox = GetNode<HBoxContainer>("%HandBox");
         _log = GetNode<RichTextLabel>("%Log");
@@ -66,9 +66,9 @@ public partial class Game : Control {
     private void OnGameState(GameStateData state) {
         _epochLabel.Text = "Epoha " + state.Epoch;
         _turnLabel.Text = "Potez " + state.Turn;
-        _natureLabel.Text = "Priroda  " + state.Elves;
-        _faithLabel.Text = "Vera  " + state.Dwarves;
-        _scienceLabel.Text = "Nauka  " + state.Humans;
+        _elfLabel.Text = "Vilenjaci  " + state.Elves;
+        _dwarfLabel.Text = "Patuljci  " + state.Dwarves;
+        _humanLabel.Text = "Ljudi  " + state.Humans;
 
         _factionLabel.Text = Factions.IsValid(_myFaction)
             ? Factions.DisplayName(_myFaction)
@@ -135,7 +135,7 @@ public partial class Game : Control {
 
         if (card != null) {
             box.AddChild(new Label {
-                Text = $"Priroda {Signed(card.Elves)}   Vera {Signed(card.Dwarves)}   Nauka {Signed(card.Humans)}",
+                Text = $"Vilenjaci {Signed(card.Elves)}   Patuljci {Signed(card.Dwarves)}   Ljudi {Signed(card.Humans)}",
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
             });
         }

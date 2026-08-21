@@ -72,7 +72,8 @@ impl GameState {
         let mut deck: Vec<&String> = CARDS.iter()
             .filter(|(key, card)| *card.class == class
                 && !exclude.contains(key)
-                && card.epoch == self.epoch) 
+                && (card.epoch == self.epoch ||
+                   card.epoch + 3 == self.epoch))
                
             .map(|(key, _)| key).collect();
 

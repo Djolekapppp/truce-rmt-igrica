@@ -241,7 +241,7 @@ public class GameStateData
 }
 
 [MessagePackObject]
-public class Modifier {
+public class ModifierMessage : IGameMessage{
     [Key("name")]
     public string Name { get; set; } = "";
 

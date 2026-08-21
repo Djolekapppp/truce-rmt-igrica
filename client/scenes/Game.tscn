@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://dsj10a1a0lhoy"]
 
-[ext_resource type="Script" path="res://scripts/Game.cs" id="1_game"]
+[ext_resource type="Script" uid="uid://crqi5v70vdyly" path="res://scripts/Game.cs" id="1_game"]
 
-[node name="Game" type="Control"]
+[node name="Game" type="Control" unique_id=1568347501]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_game")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=2061288836]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.08, 0.09, 0.12, 1)
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=976174779]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,21 +32,21 @@ theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 24
 
-[node name="VBox" type="VBoxContainer" parent="Margin"]
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=418290034]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="Header" type="HBoxContainer" parent="Margin/VBox"]
+[node name="Header" type="HBoxContainer" parent="Margin/VBox" unique_id=186649211]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="EpochLabel" type="Label" parent="Margin/VBox/Header"]
+[node name="EpochLabel" type="Label" parent="Margin/VBox/Header" unique_id=1502845253]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Epoha -"
 
-[node name="TurnLabel" type="Label" parent="Margin/VBox/Header"]
+[node name="TurnLabel" type="Label" parent="Margin/VBox/Header" unique_id=2019542217]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -54,62 +54,64 @@ theme_override_font_sizes/font_size = 16
 text = "Potez -"
 vertical_alignment = 1
 
-[node name="FactionLabel" type="Label" parent="Margin/VBox/Header"]
+[node name="FactionLabel" type="Label" parent="Margin/VBox/Header" unique_id=1435608052]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "-"
 vertical_alignment = 1
 
-[node name="Resources" type="HBoxContainer" parent="Margin/VBox"]
+[node name="Label" type="Label" parent="Margin/VBox/Header" unique_id=1655292665]
+layout_mode = 2
+
+[node name="Resources" type="HBoxContainer" parent="Margin/VBox" unique_id=118058034]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="NatureLabel" type="Label" parent="Margin/VBox/Resources"]
+[node name="NatureLabel" type="Label" parent="Margin/VBox/Resources" unique_id=533132406]
 unique_name_in_owner = true
 modulate = Color(0.35, 0.78, 0.45, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Priroda  -"
 
-[node name="FaithLabel" type="Label" parent="Margin/VBox/Resources"]
+[node name="FaithLabel" type="Label" parent="Margin/VBox/Resources" unique_id=1087357728]
 unique_name_in_owner = true
 modulate = Color(0.42, 0.6, 0.92, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Vera  -"
 
-[node name="ScienceLabel" type="Label" parent="Margin/VBox/Resources"]
+[node name="ScienceLabel" type="Label" parent="Margin/VBox/Resources" unique_id=674260123]
 unique_name_in_owner = true
 modulate = Color(0.85, 0.42, 0.32, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Nauka  -"
 
-[node name="Sep1" type="HSeparator" parent="Margin/VBox"]
+[node name="Sep1" type="HSeparator" parent="Margin/VBox" unique_id=597094747]
 layout_mode = 2
 
-[node name="HintLabel" type="Label" parent="Margin/VBox"]
+[node name="HintLabel" type="Label" parent="Margin/VBox" unique_id=916939387]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0.6)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
-text = ""
 
-[node name="HandScroll" type="ScrollContainer" parent="Margin/VBox"]
+[node name="HandScroll" type="ScrollContainer" parent="Margin/VBox" unique_id=938425045]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="HandBox" type="HBoxContainer" parent="Margin/VBox/HandScroll"]
+[node name="HandBox" type="HBoxContainer" parent="Margin/VBox/HandScroll" unique_id=884189941]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 14
 
-[node name="Sep2" type="HSeparator" parent="Margin/VBox"]
+[node name="Sep2" type="HSeparator" parent="Margin/VBox" unique_id=2103063748]
 layout_mode = 2
 
-[node name="Log" type="RichTextLabel" parent="Margin/VBox"]
+[node name="Log" type="RichTextLabel" parent="Margin/VBox" unique_id=853557736]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
