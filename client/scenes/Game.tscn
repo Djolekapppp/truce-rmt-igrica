@@ -147,6 +147,7 @@ theme_override_font_sizes/font_size = 13
 text = ""
 
 [node name="HandScroll" type="ScrollContainer" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 320)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -161,26 +162,10 @@ layout_mode = 2
 
 [node name="Log" type="RichTextLabel" parent="Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 110)
+custom_minimum_size = Vector2(0, 76)
 layout_mode = 2
 bbcode_enabled = true
 scroll_following = true
-
-[node name="ChatRow" type="HBoxContainer" parent="Margin/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ChatEdit" type="LineEdit" parent="Margin/VBox/ChatRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-placeholder_text = "poruka saigračima..."
-max_length = 200
-
-[node name="ChatSend" type="Button" parent="Margin/VBox/ChatRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Pošalji"
 
 [node name="DeckOverlay" type="Control" parent="."]
 unique_name_in_owner = true
@@ -248,7 +233,7 @@ text = ""
 autowrap_mode = 3
 
 [node name="DeckScroll" type="ScrollContainer" parent="DeckOverlay/Center/Panel/DeckMargin/DeckBox"]
-custom_minimum_size = Vector2(940, 520)
+custom_minimum_size = Vector2(1010, 540)
 layout_mode = 2
 
 [node name="DeckGrid" type="GridContainer" parent="DeckOverlay/Center/Panel/DeckMargin/DeckBox/DeckScroll"]

@@ -32,8 +32,6 @@ public partial class Game : Control {
     private Button _deckClose;
     private GridContainer _deckGrid;
 
-    private LineEdit _chatEdit;
-    private Button _chatSend;
     private Control _endOverlay;
     private Label _resultTitle;
     private Label _resultText;
@@ -76,8 +74,6 @@ public partial class Game : Control {
         _deckClose = GetNode<Button>("%DeckClose");
         _deckGrid = GetNode<GridContainer>("%DeckGrid");
 
-        _chatEdit = GetNode<LineEdit>("%ChatEdit");
-        _chatSend = GetNode<Button>("%ChatSend");
         _endOverlay = GetNode<Control>("%EndOverlay");
         _resultTitle = GetNode<Label>("%ResultTitle");
         _resultText = GetNode<Label>("%ResultText");
@@ -94,8 +90,6 @@ public partial class Game : Control {
 
         _deckButton.Pressed += ShowDeck;
         _deckClose.Pressed += () => _deckOverlay.Visible = false;
-        _chatSend.Pressed += OnChatSend;
-        _chatEdit.TextSubmitted += _ => OnChatSend();
         _playAgainButton.Pressed += OnPlayAgain;
         _exitButton.Pressed += OnExit;
 
@@ -104,7 +98,6 @@ public partial class Game : Control {
         Net.ModifierAssigned += OnModifier;
         Net.EpochDeckUpdated += OnEpochDeck;
         Net.InfoReceived += OnInfo;
-        Net.ChatReceived += OnChat;
         Net.LobbyUpdated += OnLobbyUpdated;
         Net.ErrorReceived += OnError;
         Net.GameOverReceived += OnGameOver;
@@ -136,7 +129,6 @@ public partial class Game : Control {
         Net.ModifierAssigned -= OnModifier;
         Net.EpochDeckUpdated -= OnEpochDeck;
         Net.InfoReceived -= OnInfo;
-        Net.ChatReceived -= OnChat;
         Net.LobbyUpdated -= OnLobbyUpdated;
         Net.ErrorReceived -= OnError;
         Net.GameOverReceived -= OnGameOver;
@@ -323,7 +315,7 @@ public partial class Game : Control {
         var card = CardDatabase.Get(key);
 
         var panel = new PanelContainer {
-            CustomMinimumSize = new Vector2(215, playable ? 300 : 250),
+            CustomMinimumSize = new Vector2(230, playable ? 300 : 250),
         };
 
         var margin = new MarginContainer();
@@ -500,9 +492,6 @@ public partial class Game : Control {
 
     private void OnInfo(string text) => _log.AppendText(Escape(text) + "\n");
 
-    private void OnChat(string text) =>
-        _log.AppendText($"[color=#8fd0ff]{Escape(text)}[/color]\n");
-
     private void OnError(string text) =>
         _log.AppendText($"[color=#ff7066]{Escape(text)}[/color]\n");
 
@@ -511,17 +500,6 @@ public partial class Game : Control {
     /// iz tudjih poruka moraju neutralisati.
     /// </summary>
     private static string Escape(string text) => text.Replace("[", "[lb]");
-
-    private void OnChatSend() {
-        string text = _chatEdit.Text.Trim();
-
-        if (text.Length == 0) {
-            return;
-        }
-
-        Net.SendChat(text);
-        _chatEdit.Clear();
-    }
 
     private void OnPlayAgain() {
         // Ponistavanje spremnosti tera server da posalje LobbyState svima,
