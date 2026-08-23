@@ -44,6 +44,12 @@ public static class Factions {
     public static bool IsValid(string id) =>
         id == Elves || id == Dwarves || id == Humans;
 
+    /// <summary>
+    /// Ikonice su crtane crno, pa se uvek moraju bojiti. Bele se najbolje
+    /// vide na tamnoj pozadini, a boja rase ionako stoji na tekstu pored.
+    /// </summary>
+    public static readonly Color IconColor = new(1f, 1f, 1f);
+
     private static readonly Dictionary<string, Texture2D> IconCache = new();
 
     /// <summary>
@@ -79,7 +85,7 @@ public static class Factions {
         CustomMinimumSize = new Vector2(size, size),
         ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
         StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-        SelfModulate = Tint(id),
+        SelfModulate = IconColor,
         SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
     };
 }

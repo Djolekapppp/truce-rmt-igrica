@@ -90,9 +90,13 @@ public partial class Lobby : Control {
             button.ExpandIcon = true;
             button.AddThemeConstantOverride("icon_max_width", 28);
 
-            foreach (var state in new[] { "normal", "pressed", "hover", "disabled" }) {
-                button.AddThemeColorOverride($"icon_{state}_color", Factions.Tint(id));
+            foreach (var state in new[] { "normal", "pressed", "hover", "focus" }) {
+                button.AddThemeColorOverride($"icon_{state}_color", Factions.IconColor);
             }
+
+            // Zauzeta rasa je zakljucana, pa joj se i ikonica prigusi.
+            button.AddThemeColorOverride("icon_disabled_color",
+                new Color(1f, 1f, 1f, 0.35f));
 
             string factionId = id;
             button.Pressed += () => OnFactionPressed(factionId);

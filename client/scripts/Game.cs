@@ -157,7 +157,7 @@ public partial class Game : Control {
 
     private static void SetIcon(TextureRect target, string factionId) {
         target.Texture = Factions.Icon(factionId);
-        target.SelfModulate = Factions.Tint(factionId);
+        target.SelfModulate = Factions.IconColor;
     }
 
     // --- traka epoha -----------------------------------------------------
