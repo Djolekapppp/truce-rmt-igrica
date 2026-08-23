@@ -101,11 +101,15 @@ pub enum Message {
         cards: Vec<String>,
     },
     /// Server -> pojedinacan igrac, na pocetku svake epohe.
-    /// Ceo spil iz koga mu se te epohe vuku karte, vec suzen
-    /// zlatnim/mracnim dobom, da moze da ga pregleda u klijentu.
+    ///
+    /// `cards` je ceo spil te rase za tu epohu, uvek svih osam.
+    /// `drawable` su one iz kojih se te epohe stvarno vuce - zlatno doba
+    /// vuce iz jace polovine, mracno iz slabije, mirno iz celog spila.
+    /// Klijent prikazuje svih osam, a nedostupne prigusuje.
     EpochDeck {
         epoch: u32,
         cards: Vec<String>,
+        drawable: Vec<String>,
     },
     GameState {
         seed: u64,

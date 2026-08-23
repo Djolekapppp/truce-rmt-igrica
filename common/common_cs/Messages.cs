@@ -287,9 +287,16 @@ public class EpochDeckData
     [Key("epoch")]
     public uint Epoch { get; set; }
 
-    /// <summary>Kljucevi svih karata koje mogu doci u ovoj epohi.</summary>
+    /// <summary>Ceo spil rase za ovu epohu, svih osam karata.</summary>
     [Key("cards")]
     public List<string> Cards { get; set; } = new();
+
+    /// <summary>
+    /// Podskup iz koga se te epohe stvarno vuce; zavisi od zlatnog
+    /// odnosno mracnog doba.
+    /// </summary>
+    [Key("drawable")]
+    public List<string> Drawable { get; set; } = new();
 }
 
 [MessagePackObject]

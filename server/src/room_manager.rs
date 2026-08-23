@@ -68,44 +68,51 @@ impl GameState {
         Ok(())
     }
 
-    /// Sve karte date rase koje mogu da dodju u tekucoj epohi.
-    ///
-    /// Zlatno i mracno doba se ogledaju upravo ovde: rasa u zlatnom dobu
-    /// vuce iz jace polovine svog spila, rasa u mracnom dobu iz slabije,
-    /// a treca rasa iz celog spila. Raspored doba je fiksan, vidi
-    /// `common::golden_class`.
+    /// Ceo spil date rase za tekucu epohu - uvek svih osam karata.
     ///
     /// Epohe 4-6 koriste spilove epoha 1-3 (`card.epoch + 3 == self.epoch`),
     /// ali su tada na snazi modifikatori.
-    fn epoch_pool(&self, class: &str) -> Vec<String> {
+    ///
+    /// Sortirano po jacini (ukupan uticaj na zadovoljstvo sve tri rase), pa
+    /// po kljucu, da rezultat ne zavisi od redosleda iteracije kroz HashMap.
+    fn epoch_cards(&self, class: &str) -> Vec<String> {
         let mut deck: Vec<(&String, &Card)> = CARDS.iter()
             .filter(|(_, card)| card.class == class
                 && (card.epoch == self.epoch || card.epoch + 3 == self.epoch))
             .map(|(key, card)| (key, card))
             .collect();
 
-        // Jacina karte = ukupan uticaj na zadovoljstvo sve tri rase.
-        // Kljuc ulazi u poredjenje da bi rezultat bio isti bez obzira na
-        // redosled iteracije kroz HashMap.
         let strength = |card: &Card| card.elves + card.dwarves + card.humans;
         deck.sort_by(|a, b| strength(a.1).cmp(&strength(b.1)).then(a.0.cmp(b.0)));
 
-        let age = common::age_of(class, self.epoch);
+        deck.into_iter().map(|(key, _)| key.clone()).collect()
+    }
+
+    /// Karte iz kojih se te epohe stvarno vuce.
+    ///
+    /// Ovde se ogledaju zlatno i mracno doba: rasa u zlatnom dobu vuce iz
+    /// jace polovine svog spila, rasa u mracnom iz slabije, treca iz celog.
+    /// Spil ostaje isti i svih osam karata se vidi u klijentu; menja se samo
+    /// sta moze da dodje u ruku.
+    fn drawable_cards(&self, class: &str) -> Vec<String> {
+        let mut deck = self.epoch_cards(class);
         let half = deck.len() / 2;
 
         if half > 0 {
-            match age {
+            match common::age_of(class, self.epoch) {
                 common::Age::Dark => deck.truncate(half),
                 common::Age::Golden => { deck.drain(..deck.len() - half); }
                 common::Age::Neutral => {}
             }
         }
 
-        deck.into_iter().map(|(key, _)| key.clone()).collect()
+        deck
     }
 
+    /// `exclude` su karte koje je igrac vec izvukao u ovoj epohi - one se
+    /// ne vracaju u spil dok epoha ne prodje.
     fn get_hand(&self, class: String, exclude: &[String]) -> Vec<String> {
-        let mut deck: Vec<String> = self.epoch_pool(&class)
+        let mut deck: Vec<String> = self.drawable_cards(&class)
             .into_iter()
             .filter(|key| !exclude.contains(key))
             .collect();
@@ -153,11 +160,14 @@ pub struct RoomRequest {
 
 #[derive(Debug, Clone)]
 pub struct Player {
-    pub id: u32, 
+    pub id: u32,
     pub username: String,
     pub class: String,
     pub modifier: String,
     pub hand: Vec<String>,
+    // Karte izvucene u tekucoj epohi; prazni se kad epoha prodje.
+    pub drawn: Vec<String>,
+    pub drawn_epoch: u32,
     pub ready: bool,
 }
 
@@ -296,6 +306,8 @@ impl RoomManager {
                                     for player in room.players.iter_mut().flatten() {
                                         player.modifier.clear();
                                         player.hand.clear();
+                                        player.drawn.clear();
+                                        player.drawn_epoch = 0;
                                     }
 
                                     common::Message::GameState {
@@ -633,6 +645,8 @@ impl RoomManager {
             player.class = String::new();
             player.ready = false;
             player.hand = vec![String::new(), String::new()];
+            player.drawn.clear();
+            player.drawn_epoch = 0;
             player.modifier = String::new();
         }
 
@@ -739,6 +753,8 @@ impl RoomManager {
             class: "".to_string(),
             hand: vec!["".to_string(),"".to_string()],
             modifier: "".to_string(),
+            drawn: Vec::new(),
+            drawn_epoch: 0,
             ready: false,
         };
         self.players.insert(player_id, player);
@@ -786,7 +802,8 @@ impl RoomManager {
                     player.id,
                     common::Message::EpochDeck {
                         epoch: room.game.epoch,
-                        cards: room.game.epoch_pool(&player.class),
+                        cards: room.game.epoch_cards(&player.class),
+                        drawable: room.game.drawable_cards(&player.class),
                     },
                 ))
                 .collect::<Vec<_>>()
@@ -806,8 +823,15 @@ impl RoomManager {
             let mut messages = Vec::new();
 
             for player in room.players.iter_mut().flatten() {
-                let cards = room.game.get_hand(player.class.clone(), &player.hand);
+                // Nova epoha znaci nov spil, pa se istorija izvlacenja brise.
+                if player.drawn_epoch != room.game.epoch {
+                    player.drawn_epoch = room.game.epoch;
+                    player.drawn.clear();
+                }
 
+                let cards = room.game.get_hand(player.class.clone(), &player.drawn);
+
+                player.drawn.extend(cards.iter().cloned());
                 player.hand = cards.clone();
 
                 messages.push((
@@ -862,7 +886,11 @@ mod tests {
             let game = state(epoch);
 
             for class in common::CLASSES {
-                let pool = game.epoch_pool(class);
+                // Spil je uvek svih osam karata, bez obzira na doba.
+                assert_eq!(game.epoch_cards(class).len(), 8,
+                    "epoha {} {}: spil mora imati 8 karata", epoch, class);
+
+                let pool = game.drawable_cards(class);
                 let weakest = pool.iter().map(|k| strength(k)).min().unwrap();
                 let strongest = pool.iter().map(|k| strength(k)).max().unwrap();
 
@@ -870,7 +898,7 @@ mod tests {
                     common::Age::Neutral => assert_eq!(pool.len(), 8,
                         "epoha {} {}: mirno doba vuce iz celog spila", epoch, class),
                     _ => assert_eq!(pool.len(), 4,
-                        "epoha {} {}: doba suzava spil na polovinu", epoch, class),
+                        "epoha {} {}: doba suzava izvlacenje na polovinu", epoch, class),
                 }
 
                 // Zlatna polovina mora biti jaca od mracne za istu rasu.
@@ -893,7 +921,7 @@ mod tests {
     fn epohe_4_6_koriste_spilove_epoha_1_3() {
         for epoch in 4..=6 {
             for class in common::CLASSES {
-                for key in state(epoch).epoch_pool(class) {
+                for key in state(epoch).epoch_cards(class) {
                     assert_eq!(CARDS[&key].epoch, epoch - 3,
                         "epoha {} treba da vuce karte epohe {}", epoch, epoch - 3);
                 }
@@ -907,7 +935,7 @@ mod tests {
             let game = state(epoch);
 
             for class in common::CLASSES {
-                let pool = game.epoch_pool(class);
+                let pool = game.drawable_cards(class);
                 let hand = game.get_hand(class.to_string(), &[]);
 
                 assert_eq!(hand.len(), 2, "epoha {} {}", epoch, class);
@@ -915,6 +943,25 @@ mod tests {
 
                 for key in &hand {
                     assert!(pool.contains(key), "karta van spila epohe");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn izvucena_karta_se_ne_vraca_u_istoj_epohi() {
+        for epoch in 1..=common::EPOCH_COUNT {
+            let game = state(epoch);
+
+            for class in common::CLASSES {
+                let prva = game.get_hand(class.to_string(), &[]);
+                let druga = game.get_hand(class.to_string(), &prva);
+
+                assert_eq!(druga.len(), 2, "epoha {} {}", epoch, class);
+
+                for key in &druga {
+                    assert!(!prva.contains(key),
+                        "epoha {} {}: karta {} izvucena dvaput", epoch, class, key);
                 }
             }
         }

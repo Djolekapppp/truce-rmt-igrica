@@ -217,13 +217,13 @@ public partial class Game : Control {
 
         _epochLabel.Text = $"Epoha {epoch} / {Ages.EpochCount}";
         _turnLabel.Text = $"Runda {state.Turn} od {Ages.EpochCount * 2}";
-        _elvesLabel.Text = "Vilenjaci  " + state.Elves;
-        _dwarvesLabel.Text = "Patuljci  " + state.Dwarves;
-        _humansLabel.Text = "Ljudi  " + state.Humans;
+        _elvesLabel.Text = ResourceLine(Factions.Elves, state.Elves);
+        _dwarvesLabel.Text = ResourceLine(Factions.Dwarves, state.Dwarves);
+        _humansLabel.Text = ResourceLine(Factions.Humans, state.Humans);
 
         _factionLabel.Text = Factions.IsValid(_myFaction)
-            ? Factions.DisplayName(_myFaction)
-            : "-";
+            ? $"{Net.Username} · {Factions.DisplayName(_myFaction)}"
+            : Net.Username;
         _factionLabel.Modulate = Factions.Tint(_myFaction);
 
         var age = Ages.Of(_myFaction, epoch);
@@ -238,6 +238,28 @@ public partial class Game : Control {
             _lastTurn = state.Turn;
             SetWaiting(false);
         }
+    }
+
+    /// <summary>
+    /// Ime igraca koji vodi datu rasu. Cita se iz poslednjeg stanja lobija,
+    /// koje GameNet cuva i posto partija pocne.
+    /// </summary>
+    private string UsernameFor(string factionId) {
+        foreach (var player in Net.LobbyPlayers) {
+            if (player.Class == factionId) {
+                return player.Username;
+            }
+        }
+
+        return "";
+    }
+
+    private string ResourceLine(string factionId, int value) {
+        string username = UsernameFor(factionId);
+
+        return username.Length > 0
+            ? $"{Factions.DisplayName(factionId)} ({username})  {value}"
+            : $"{Factions.DisplayName(factionId)}  {value}";
     }
 
     private void OnModifier(ModifierData data) {
@@ -263,7 +285,7 @@ public partial class Game : Control {
 
     private void OnEpochDeck(EpochDeckData deck) {
         _deckButton.Disabled = false;
-        _deckButton.Text = $"Špil epohe ({deck.Cards.Count})";
+        _deckButton.Text = $"Špil epohe ({deck.Drawable.Count}/{deck.Cards.Count})";
 
         if (_deckOverlay.Visible) {
             ShowDeck();
@@ -473,7 +495,9 @@ public partial class Game : Control {
 
         _deckTitle.Text = $"Špil epohe {epoch} - {Factions.DisplayName(_myFaction)}";
         _deckHint.Text = $"{Ages.DisplayName(age)}: {Ages.Explain(age)}. "
-            + $"Svake runde ti se iz ovih {deck.Cards.Count} karata izvlače dve.";
+            + $"Od {deck.Cards.Count} karata u špilu, ove epohe ti može doći "
+            + $"{deck.Drawable.Count}; ostale su zatamnjene. "
+            + "Svake runde se izvlače dve, a izvučene se ne vraćaju do kraja epohe.";
         _deckHint.Modulate = Ages.Tint(age);
 
         foreach (var child in _deckGrid.GetChildren()) {
@@ -482,7 +506,14 @@ public partial class Game : Control {
         }
 
         foreach (var key in deck.Cards) {
-            _deckGrid.AddChild(BuildCardPanel(key, false));
+            var panel = BuildCardPanel(key, false);
+
+            if (!deck.Drawable.Contains(key)) {
+                panel.Modulate = new Color(1f, 1f, 1f, 0.32f);
+                panel.TooltipText = $"Ne može ti doći u ovoj epohi ({Ages.DisplayName(age)})";
+            }
+
+            _deckGrid.AddChild(panel);
         }
 
         _deckOverlay.Visible = true;
@@ -583,6 +614,18 @@ public partial class Game : Control {
         name.AddThemeFontSizeOverride("font_size", 12);
         name.AddThemeColorOverride("font_color", Factions.Tint(factionId));
         box.AddChild(name);
+
+        string username = UsernameFor(factionId);
+
+        if (username.Length > 0) {
+            var player = new Label {
+                Text = username,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Modulate = new Color(1f, 1f, 1f, 0.6f),
+            };
+            player.AddThemeFontSizeOverride("font_size", 11);
+            box.AddChild(player);
+        }
 
         var score = new Label {
             Text = value.ToString(),
