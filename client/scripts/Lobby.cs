@@ -84,6 +84,16 @@ public partial class Lobby : Control {
 
             button.AddThemeColorOverride("font_color", Factions.Tint(id));
 
+            // expand_icon je bitan: bez njega bi minimalna sirina dugmeta
+            // porasla na punu velicinu teksture.
+            button.Icon = Factions.Icon(id);
+            button.ExpandIcon = true;
+            button.AddThemeConstantOverride("icon_max_width", 28);
+
+            foreach (var state in new[] { "normal", "pressed", "hover", "disabled" }) {
+                button.AddThemeColorOverride($"icon_{state}_color", Factions.Tint(id));
+            }
+
             string factionId = id;
             button.Pressed += () => OnFactionPressed(factionId);
 
@@ -106,11 +116,9 @@ public partial class Lobby : Control {
         row.AddThemeConstantOverride("separation", 12);
         margin.AddChild(row);
 
-        var swatch = new ColorRect {
-            CustomMinimumSize = new Vector2(6, 0),
-            Color = Factions.Tint(player.Class),
-        };
-        row.AddChild(swatch);
+        // Ikonica rase ispred imena. Dok rasa nije izabrana ostaje prazno
+        // mesto iste sirine, pa se redovi ne pomeraju.
+        row.AddChild(Factions.IconRect(player.Class, 28));
 
         var names = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         row.AddChild(names);

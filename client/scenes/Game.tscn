@@ -63,6 +63,14 @@ theme_override_font_sizes/font_size = 14
 text = "Runda -"
 vertical_alignment = 1
 
+[node name="FactionIcon" type="TextureRect" parent="Margin/VBox/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
 [node name="FactionLabel" type="Label" parent="Margin/VBox/Header"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -85,26 +93,63 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="ElvesLabel" type="Label" parent="Margin/VBox/Resources"]
+[node name="ElvesBox" type="HBoxContainer" parent="Margin/VBox/Resources"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ElvesIcon" type="TextureRect" parent="Margin/VBox/Resources/ElvesBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ElvesLabel" type="Label" parent="Margin/VBox/Resources/ElvesBox"]
 unique_name_in_owner = true
 modulate = Color(0.35, 0.78, 0.45, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Vilenjaci  -"
 
-[node name="DwarvesLabel" type="Label" parent="Margin/VBox/Resources"]
+[node name="DwarvesBox" type="HBoxContainer" parent="Margin/VBox/Resources"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DwarvesIcon" type="TextureRect" parent="Margin/VBox/Resources/DwarvesBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DwarvesLabel" type="Label" parent="Margin/VBox/Resources/DwarvesBox"]
 unique_name_in_owner = true
 modulate = Color(0.85, 0.42, 0.32, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Patuljci  -"
 
-[node name="HumansLabel" type="Label" parent="Margin/VBox/Resources"]
+[node name="HumansBox" type="HBoxContainer" parent="Margin/VBox/Resources"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HumansIcon" type="TextureRect" parent="Margin/VBox/Resources/HumansBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HumansLabel" type="Label" parent="Margin/VBox/Resources/HumansBox"]
 unique_name_in_owner = true
 modulate = Color(0.42, 0.6, 0.92, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Ljudi  -"
+
 
 [node name="ModifierPanel" type="PanelContainer" parent="Margin/VBox"]
 unique_name_in_owner = true

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Ljudi: mac -->
+  <g fill="#000000">
+    <!-- secivo -->
+    <path d="M256 20 L 308 122 L 308 314 L 204 314 L 204 122 Z"/>
+    <!-- nakrsnica -->
+    <rect x="124" y="314" width="264" height="48" rx="16"/>
+    <!-- balcak -->
+    <rect x="228" y="362" width="56" height="82"/>
+    <!-- jabuka -->
+    <circle cx="256" cy="466" r="36"/>
+  </g>
+</svg>

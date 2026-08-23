@@ -13,9 +13,13 @@ public partial class Game : Control {
     private Label _epochLabel;
     private Label _ageLabel;
     private Label _turnLabel;
+    private TextureRect _factionIcon;
     private Label _factionLabel;
     private Button _deckButton;
     private HBoxContainer _epochStrip;
+    private TextureRect _elvesIcon;
+    private TextureRect _dwarvesIcon;
+    private TextureRect _humansIcon;
     private Label _elvesLabel;
     private Label _dwarvesLabel;
     private Label _humansLabel;
@@ -55,9 +59,13 @@ public partial class Game : Control {
         _epochLabel = GetNode<Label>("%EpochLabel");
         _ageLabel = GetNode<Label>("%AgeLabel");
         _turnLabel = GetNode<Label>("%TurnLabel");
+        _factionIcon = GetNode<TextureRect>("%FactionIcon");
         _factionLabel = GetNode<Label>("%FactionLabel");
         _deckButton = GetNode<Button>("%DeckButton");
         _epochStrip = GetNode<HBoxContainer>("%EpochStrip");
+        _elvesIcon = GetNode<TextureRect>("%ElvesIcon");
+        _dwarvesIcon = GetNode<TextureRect>("%DwarvesIcon");
+        _humansIcon = GetNode<TextureRect>("%HumansIcon");
         _elvesLabel = GetNode<Label>("%ElvesLabel");
         _dwarvesLabel = GetNode<Label>("%DwarvesLabel");
         _humansLabel = GetNode<Label>("%HumansLabel");
@@ -85,6 +93,11 @@ public partial class Game : Control {
         var me = Net.FindMe();
         _myFaction = me != null ? me.Class : "";
         _lastTurn = Net.GameState.Turn;
+
+        SetIcon(_elvesIcon, Factions.Elves);
+        SetIcon(_dwarvesIcon, Factions.Dwarves);
+        SetIcon(_humansIcon, Factions.Humans);
+        SetIcon(_factionIcon, _myFaction);
 
         BuildEpochStrip();
 
@@ -140,6 +153,11 @@ public partial class Game : Control {
             _deckOverlay.Visible = false;
             GetViewport().SetInputAsHandled();
         }
+    }
+
+    private static void SetIcon(TextureRect target, string factionId) {
+        target.Texture = Factions.Icon(factionId);
+        target.SelfModulate = Factions.Tint(factionId);
     }
 
     // --- traka epoha -----------------------------------------------------
@@ -606,6 +624,10 @@ public partial class Game : Control {
     private Control BuildFinalScore(string factionId, int value) {
         var box = new VBoxContainer();
         box.AddThemeConstantOverride("separation", 2);
+
+        var icon = Factions.IconRect(factionId, 32);
+        icon.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+        box.AddChild(icon);
 
         var name = new Label {
             Text = Factions.DisplayName(factionId),
