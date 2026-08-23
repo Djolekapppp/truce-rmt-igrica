@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Vilenjaci: luk i strela -->
+  <g fill="#ffffff">
+    <!-- telo luka -->
+    <path d="M150 40 C 300 150, 300 362, 150 472 L 190 472 C 336 356, 336 156, 190 40 Z"/>
+    <!-- tetiva -->
+    <rect x="140" y="40" width="16" height="432"/>
+    <!-- strela -->
+    <rect x="96" y="240" width="296" height="32"/>
+    <path d="M378 202 L 474 256 L 378 310 Z"/>
+    <path d="M96 240 L 36 196 L 36 316 L 96 272 Z"/>
+  </g>
+</svg>

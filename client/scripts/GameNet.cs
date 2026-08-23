@@ -33,14 +33,21 @@ public partial class GameNet : Node {
     public GameStateData GameState { get; private set; } = new();
     public List<string> Hand { get; private set; } = new();
 
+    /// <summary>Modifikator ovog igraca, null dok ne pocne 4. epoha.</summary>
+    public ModifierData Modifier { get; private set; }
+
+    /// <summary>Spil iz koga se ovom igracu vuku karte u tekucoj epohi.</summary>
+    public EpochDeckData EpochDeck { get; private set; }
+
     public event Action<LobbyStateData> LobbyUpdated;
     public event Action<GameStateData> GameStateUpdated;
-    // public event Action<ModifierData> ModifierAdded;
+    public event Action<ModifierData> ModifierAssigned;
+    public event Action<EpochDeckData> EpochDeckUpdated;
     public event Action<List<string>> HandUpdated;
     public event Action<string> ChatReceived;
     public event Action<string> InfoReceived;
     public event Action<string> ErrorReceived;
-    public event Action GameOverReceived;
+    public event Action<GameOverData> GameOverReceived;
     public event Action<string> ConnectionLost;
 
     public override void _EnterTree() {
@@ -86,6 +93,8 @@ public partial class GameNet : Node {
         _lobbyPlayers.Clear();
         Hand.Clear();
         GameState = new GameStateData();
+        Modifier = null;
+        EpochDeck = null;
 
         while (_incoming.TryDequeue(out _)) { }
     }
@@ -185,9 +194,19 @@ public partial class GameNet : Node {
                 GameStateUpdated?.Invoke(state.Data);
                 break;
 
-            // case ModifierMessage modifier:
-            //     ModifierAdded?.Invoke(modifier.Data);
-            //     break;
+            case ModifierMessage modifier:
+                // Server salje prazan modifikator na pocetku partije, da
+                // klijent ne bi zadrzao onaj iz prethodne.
+                Modifier = string.IsNullOrEmpty(modifier.Data.Modifier)
+                    ? null
+                    : modifier.Data;
+                ModifierAssigned?.Invoke(Modifier);
+                break;
+
+            case EpochDeckMessage deck:
+                EpochDeck = deck.Data;
+                EpochDeckUpdated?.Invoke(deck.Data);
+                break;
 
             case HandMessage hand:
                 Hand = hand.Data.Cards;
@@ -198,8 +217,8 @@ public partial class GameNet : Node {
                 ChatReceived?.Invoke(chat.Data.Content);
                 break;
 
-            case GameOverMessage:
-                GameOverReceived?.Invoke();
+            case GameOverMessage gameOver:
+                GameOverReceived?.Invoke(gameOver.Data);
                 break;
 
             case ResponseMessage response:

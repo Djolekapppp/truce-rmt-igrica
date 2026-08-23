@@ -155,6 +155,17 @@ public class GameOverMessage : IGameMessage
 {
     [Key("kind")]
     public string Type => "GameOver";
+
+    [Key("payload")]
+    public GameOverData Data { get; set; } = new();
+}
+
+[MessagePackObject]
+public class GameOverData
+{
+    /// <summary>True ako su igraci izdrzali svih sest epoha.</summary>
+    [Key("won")]
+    public bool Won { get; set; }
 }
 
 [MessagePackObject]
@@ -241,20 +252,51 @@ public class GameStateData
 }
 
 [MessagePackObject]
-public class ModifierMessage : IGameMessage{
-    [Key("name")]
-    public string Name { get; set; } = "";
+public class ModifierMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "Modifier";
 
     [Key("payload")]
     public ModifierData Data { get; set; } = new();
 }
 
 [MessagePackObject]
-public class ModifierData {
+public class ModifierData
+{
     [Key("modifier")]
     public string Modifier { get; set; } = "";
+
     [Key("value")]
     public float Value { get; set; } = 0;
+}
+
+[MessagePackObject]
+public class EpochDeckMessage : IGameMessage
+{
+    [Key("kind")]
+    public string Type => "EpochDeck";
+
+    [Key("payload")]
+    public EpochDeckData Data { get; set; } = new();
+}
+
+[MessagePackObject]
+public class EpochDeckData
+{
+    [Key("epoch")]
+    public uint Epoch { get; set; }
+
+    /// <summary>Ceo spil rase za ovu epohu, svih osam karata.</summary>
+    [Key("cards")]
+    public List<string> Cards { get; set; } = new();
+
+    /// <summary>
+    /// Podskup iz koga se te epohe stvarno vuce; zavisi od zlatnog
+    /// odnosno mracnog doba.
+    /// </summary>
+    [Key("drawable")]
+    public List<string> Drawable { get; set; } = new();
 }
 
 [MessagePackObject]
@@ -342,6 +384,8 @@ public class GameMessageFormatter : IMessagePackFormatter<IGameMessage>
             "JoinRoom" => MessagePackSerializer.Deserialize<JoinRoomMessage>(ref reader, options),
             "Card" => MessagePackSerializer.Deserialize<CardMessage>(ref reader, options),
             "Hand" => MessagePackSerializer.Deserialize<HandMessage>(ref reader, options),
+            "EpochDeck" => MessagePackSerializer.Deserialize<EpochDeckMessage>(ref reader, options),
+            "Modifier" => MessagePackSerializer.Deserialize<ModifierMessage>(ref reader, options),
             "StartGame" => MessagePackSerializer.Deserialize<StartGameMessage>(ref reader, options),
             "GameState" => MessagePackSerializer.Deserialize<GameStateMessage>(ref reader, options),
             "Chat" => MessagePackSerializer.Deserialize<ChatMessage>(ref reader, options),

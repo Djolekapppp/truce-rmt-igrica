@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://dsj10a1a0lhoy"]
+[gd_scene load_steps=2 format=3 uid="uid://dsj10a1a0lhoy"]
 
 [ext_resource type="Script" uid="uid://crqi5v70vdyly" path="res://scripts/Game.cs" id="1_game"]
 
-[node name="Game" type="Control" unique_id=1568347501]
+[node name="Game" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_game")
 
-[node name="Background" type="ColorRect" parent="." unique_id=2061288836]
+[node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.08, 0.09, 0.12, 1)
 
-[node name="Margin" type="MarginContainer" parent="." unique_id=976174779]
+[node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,88 +32,349 @@ theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 24
 
-[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=418290034]
+[node name="VBox" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 12
 
-[node name="Header" type="HBoxContainer" parent="Margin/VBox" unique_id=186649211]
+[node name="Header" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 18
 
-[node name="EpochLabel" type="Label" parent="Margin/VBox/Header" unique_id=1502845253]
+[node name="EpochLabel" type="Label" parent="Margin/VBox/Header"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Epoha -"
-
-[node name="TurnLabel" type="Label" parent="Margin/VBox/Header" unique_id=2019542217]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 16
-text = "Potez -"
 vertical_alignment = 1
 
-[node name="FactionLabel" type="Label" parent="Margin/VBox/Header" unique_id=1435608052]
+[node name="AgeLabel" type="Label" parent="Margin/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = ""
+vertical_alignment = 1
+
+[node name="TurnLabel" type="Label" parent="Margin/VBox/Header"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.6)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "Runda -"
+vertical_alignment = 1
+
+[node name="FactionIcon" type="TextureRect" parent="Margin/VBox/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FactionLabel" type="Label" parent="Margin/VBox/Header"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "-"
 vertical_alignment = 1
 
-[node name="Label" type="Label" parent="Margin/VBox/Header" unique_id=1655292665]
+[node name="DeckButton" type="Button" parent="Margin/VBox/Header"]
+unique_name_in_owner = true
 layout_mode = 2
+disabled = true
+text = "Špil epohe"
 
-[node name="Resources" type="HBoxContainer" parent="Margin/VBox" unique_id=118058034]
+[node name="EpochStrip" type="HBoxContainer" parent="Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Resources" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="NatureLabel" type="Label" parent="Margin/VBox/Resources" unique_id=533132406]
+[node name="ElvesBox" type="HBoxContainer" parent="Margin/VBox/Resources"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ElvesIcon" type="TextureRect" parent="Margin/VBox/Resources/ElvesBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ElvesLabel" type="Label" parent="Margin/VBox/Resources/ElvesBox"]
 unique_name_in_owner = true
 modulate = Color(0.35, 0.78, 0.45, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Priroda  -"
+text = "Vilenjaci  -"
 
-[node name="FaithLabel" type="Label" parent="Margin/VBox/Resources" unique_id=1087357728]
-unique_name_in_owner = true
-modulate = Color(0.42, 0.6, 0.92, 1)
+[node name="DwarvesBox" type="HBoxContainer" parent="Margin/VBox/Resources"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Vera  -"
+theme_override_constants/separation = 8
 
-[node name="ScienceLabel" type="Label" parent="Margin/VBox/Resources" unique_id=674260123]
+[node name="DwarvesIcon" type="TextureRect" parent="Margin/VBox/Resources/DwarvesBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DwarvesLabel" type="Label" parent="Margin/VBox/Resources/DwarvesBox"]
 unique_name_in_owner = true
 modulate = Color(0.85, 0.42, 0.32, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Nauka  -"
+text = "Patuljci  -"
 
-[node name="Sep1" type="HSeparator" parent="Margin/VBox" unique_id=597094747]
+[node name="HumansBox" type="HBoxContainer" parent="Margin/VBox/Resources"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HumansIcon" type="TextureRect" parent="Margin/VBox/Resources/HumansBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HumansLabel" type="Label" parent="Margin/VBox/Resources/HumansBox"]
+unique_name_in_owner = true
+modulate = Color(0.42, 0.6, 0.92, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Ljudi  -"
+
+
+[node name="ModifierPanel" type="PanelContainer" parent="Margin/VBox"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 
-[node name="HintLabel" type="Label" parent="Margin/VBox" unique_id=916939387]
+[node name="ModifierMargin" type="MarginContainer" parent="Margin/VBox/ModifierPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="ModifierBox" type="VBoxContainer" parent="Margin/VBox/ModifierPanel/ModifierMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ModifierTitle" type="Label" parent="Margin/VBox/ModifierPanel/ModifierMargin/ModifierBox"]
 unique_name_in_owner = true
-modulate = Color(1, 1, 1, 0.6)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = ""
+
+[node name="ModifierDesc" type="Label" parent="Margin/VBox/ModifierPanel/ModifierMargin/ModifierBox"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.7)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ""
+autowrap_mode = 3
+
+[node name="Sep1" type="HSeparator" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="HintLabel" type="Label" parent="Margin/VBox"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.65)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
+text = ""
 
-[node name="HandScroll" type="ScrollContainer" parent="Margin/VBox" unique_id=938425045]
+[node name="HandScroll" type="ScrollContainer" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 320)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="HandBox" type="HBoxContainer" parent="Margin/VBox/HandScroll" unique_id=884189941]
+[node name="HandBox" type="HBoxContainer" parent="Margin/VBox/HandScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 14
 
-[node name="Sep2" type="HSeparator" parent="Margin/VBox" unique_id=2103063748]
+[node name="Sep2" type="HSeparator" parent="Margin/VBox"]
 layout_mode = 2
 
-[node name="Log" type="RichTextLabel" parent="Margin/VBox" unique_id=853557736]
+[node name="Log" type="RichTextLabel" parent="Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 120)
+custom_minimum_size = Vector2(0, 76)
 layout_mode = 2
 bbcode_enabled = true
 scroll_following = true
+
+[node name="DeckOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="DeckOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.72)
+
+[node name="Center" type="CenterContainer" parent="DeckOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="DeckOverlay/Center"]
+layout_mode = 2
+
+[node name="DeckMargin" type="MarginContainer" parent="DeckOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="DeckBox" type="VBoxContainer" parent="DeckOverlay/Center/Panel/DeckMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DeckHeader" type="HBoxContainer" parent="DeckOverlay/Center/Panel/DeckMargin/DeckBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="DeckTitle" type="Label" parent="DeckOverlay/Center/Panel/DeckMargin/DeckBox/DeckHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "Špil epohe"
+
+[node name="DeckClose" type="Button" parent="DeckOverlay/Center/Panel/DeckMargin/DeckBox/DeckHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Zatvori"
+
+[node name="DeckHint" type="Label" parent="DeckOverlay/Center/Panel/DeckMargin/DeckBox"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.65)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ""
+autowrap_mode = 3
+
+[node name="DeckScroll" type="ScrollContainer" parent="DeckOverlay/Center/Panel/DeckMargin/DeckBox"]
+custom_minimum_size = Vector2(1010, 540)
+layout_mode = 2
+
+[node name="DeckGrid" type="GridContainer" parent="DeckOverlay/Center/Panel/DeckMargin/DeckBox/DeckScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 4
+
+[node name="EndOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="EndOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.03, 0.05, 0.88)
+
+[node name="Center" type="CenterContainer" parent="EndOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="EndOverlay/Center"]
+custom_minimum_size = Vector2(680, 0)
+layout_mode = 2
+
+[node name="EndMargin" type="MarginContainer" parent="EndOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 44
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 44
+
+[node name="EndBox" type="VBoxContainer" parent="EndOverlay/Center/Panel/EndMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ResultTitle" type="Label" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 52
+text = ""
+horizontal_alignment = 1
+
+[node name="ResultText" type="Label" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.78)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ScoreRow" type="HBoxContainer" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 36
+
+[node name="EndSep" type="HSeparator" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+layout_mode = 2
+
+[node name="PlayAgainButton" type="Button" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Igraj ponovo"
+
+[node name="ExitButton" type="Button" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Izađi"
+
+[node name="EndHint" type="Label" parent="EndOverlay/Center/Panel/EndMargin/EndBox"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.5)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3

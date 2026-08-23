@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 /// <summary>
@@ -42,4 +43,52 @@ public static class Factions {
 
     public static bool IsValid(string id) =>
         id == Elves || id == Dwarves || id == Humans;
+
+    /// <summary>
+    /// Boja ikonica. Bela se najbolje vidi na tamnoj pozadini, a boja rase
+    /// ionako stoji na tekstu pored.
+    ///
+    /// Ikonice u assets/icons/ moraju ostati crtane belo: modulate mnozi
+    /// boju teksture, pa se crna ikonica ne moze posvetliti ni u sta.
+    /// </summary>
+    public static readonly Color IconColor = new(1f, 1f, 1f);
+
+    private static readonly Dictionary<string, Texture2D> IconCache = new();
+
+    /// <summary>
+    /// Ikonica rase: vilenjaci luk, patuljci sekira, ljudi mac.
+    ///
+    /// Trazi se i .svg i .png pod istim imenom, pa se nacrtane ikonice mogu
+    /// zameniti svojima bez diranja koda. Ako fajla nema, vraca null i
+    /// TextureRect jednostavno ne iscrta nista.
+    /// </summary>
+    public static Texture2D Icon(string id) {
+        if (IconCache.TryGetValue(id, out var cached)) {
+            return cached;
+        }
+
+        Texture2D texture = null;
+
+        foreach (var extension in new[] { ".svg", ".png" }) {
+            string path = $"res://assets/icons/{id}{extension}";
+
+            if (ResourceLoader.Exists(path)) {
+                texture = ResourceLoader.Load<Texture2D>(path);
+                break;
+            }
+        }
+
+        IconCache[id] = texture;
+        return texture;
+    }
+
+    /// <summary>Ikonica spremna da stane ispred imena rase.</summary>
+    public static TextureRect IconRect(string id, int size) => new() {
+        Texture = Icon(id),
+        CustomMinimumSize = new Vector2(size, size),
+        ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+        StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+        SelfModulate = IconColor,
+        SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
+    };
 }
