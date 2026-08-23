@@ -45,8 +45,11 @@ public static class Factions {
         id == Elves || id == Dwarves || id == Humans;
 
     /// <summary>
-    /// Ikonice su crtane crno, pa se uvek moraju bojiti. Bele se najbolje
-    /// vide na tamnoj pozadini, a boja rase ionako stoji na tekstu pored.
+    /// Boja ikonica. Bela se najbolje vidi na tamnoj pozadini, a boja rase
+    /// ionako stoji na tekstu pored.
+    ///
+    /// Ikonice u assets/icons/ moraju ostati crtane belo: modulate mnozi
+    /// boju teksture, pa se crna ikonica ne moze posvetliti ni u sta.
     /// </summary>
     public static readonly Color IconColor = new(1f, 1f, 1f);
 
