@@ -6,6 +6,7 @@ client/export_presets.cfg
 # Rust
 server/.env
 server/target/
+server/dockerfile
 common/common_rust/target/
 
 # C#

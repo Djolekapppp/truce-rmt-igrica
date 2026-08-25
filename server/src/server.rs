@@ -32,7 +32,7 @@ impl Server {
     pub async fn start(&self) -> Result<(), Box<dyn std::error::Error>> {
         // Start the server and listen for incoming connections
         let listener = TcpListener::bind(self.addr.clone()).await?;
-        println!("Server is listening on 127.0.0.1:8080");
+        println!("Server is listening on {}", self.addr.clone());
 
         let mut next_id = 0;
 
