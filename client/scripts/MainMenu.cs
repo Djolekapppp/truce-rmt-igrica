@@ -11,6 +11,7 @@ public partial class MainMenu : Control {
     private LineEdit _usernameEdit;
     private Button _connectButton;
     private Button _disconnectButton;
+    private Button _defaultAddressButton;
     private Control _roomSection;
     private Button _createRoomButton;
     private LineEdit _roomIdEdit;
@@ -22,6 +23,7 @@ public partial class MainMenu : Control {
     public override void _Ready() {
         _hostEdit = GetNode<LineEdit>("%HostEdit");
         _portEdit = GetNode<LineEdit>("%PortEdit");
+        _defaultAddressButton = GetNode<Button>("%defaultAddressButton");
         _usernameEdit = GetNode<LineEdit>("%UsernameEdit");
         _connectButton = GetNode<Button>("%ConnectButton");
         _disconnectButton = GetNode<Button>("%DisconnectButton");
@@ -31,6 +33,7 @@ public partial class MainMenu : Control {
         _joinRoomButton = GetNode<Button>("%JoinRoomButton");
         _statusLabel = GetNode<Label>("%StatusLabel");
 
+        _defaultAddressButton.Pressed += OnDefaultAddressPressed;
         _connectButton.Pressed += OnConnectPressed;
         _disconnectButton.Pressed += OnDisconnectPressed;
         _createRoomButton.Pressed += OnCreateRoomPressed;
@@ -71,6 +74,11 @@ public partial class MainMenu : Control {
         _connectButton.Disabled = connected;
         _disconnectButton.Disabled = !connected;
         _roomSection.Visible = connected;
+    }
+
+    private async void OnDefaultAddressPressed() {
+        _hostEdit.Text = "152.67.90.159";
+        _portEdit.Text = "8080";
     }
 
     private async void OnConnectPressed() {

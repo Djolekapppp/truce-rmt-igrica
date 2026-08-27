@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://dpx6w65cjo0ko"]
 
-[ext_resource type="Script" path="res://scripts/MainMenu.cs" id="1_mainmenu"]
+[ext_resource type="Script" uid="uid://cgirdamvxne67" path="res://scripts/MainMenu.cs" id="1_mainmenu"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=1637104597]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mainmenu")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=751188655]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.08, 0.09, 0.12, 1)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Center" type="CenterContainer" parent="." unique_id=1174652619]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,112 +28,119 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="PanelContainer" parent="Center"]
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=840296755]
 custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
 
-[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=711443600]
 layout_mode = 2
 theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 28
 theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 28
 
-[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=1871045552]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="Title" type="Label" parent="Center/Panel/Margin/VBox" unique_id=2033531898]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "Cuvari mira"
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="Subtitle" type="Label" parent="Center/Panel/Margin/VBox" unique_id=1735674890]
 modulate = Color(1, 1, 1, 0.6)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "Vilenjaci, Patuljci i Ljudi - troje igraca, jedan mir"
 horizontal_alignment = 1
 
-[node name="Sep1" type="HSeparator" parent="Center/Panel/Margin/VBox"]
+[node name="Sep1" type="HSeparator" parent="Center/Panel/Margin/VBox" unique_id=1276012675]
 layout_mode = 2
 
-[node name="ServerRow" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
+[node name="ServerRow" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=85149373]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="HostEdit" type="LineEdit" parent="Center/Panel/Margin/VBox/ServerRow"]
+[node name="HostEdit" type="LineEdit" parent="Center/Panel/Margin/VBox/ServerRow" unique_id=1899128768]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "127.0.0.1"
 placeholder_text = "adresa servera"
 
-[node name="PortEdit" type="LineEdit" parent="Center/Panel/Margin/VBox/ServerRow"]
+[node name="PortEdit" type="LineEdit" parent="Center/Panel/Margin/VBox/ServerRow" unique_id=60844975]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 0)
 layout_mode = 2
 text = "8080"
 placeholder_text = "port"
 
-[node name="UsernameEdit" type="LineEdit" parent="Center/Panel/Margin/VBox"]
+[node name="defaultAddressButton" type="Button" parent="Center/Panel/Margin/VBox/ServerRow" unique_id=1303351473]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "default"
+
+[node name="UsernameEdit" type="LineEdit" parent="Center/Panel/Margin/VBox" unique_id=1382767357]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "korisnicko ime"
 
-[node name="ButtonRow" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
+[node name="ButtonRow" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=135184639]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ConnectButton" type="Button" parent="Center/Panel/Margin/VBox/ButtonRow"]
+[node name="ConnectButton" type="Button" parent="Center/Panel/Margin/VBox/ButtonRow" unique_id=1568470162]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Povezi se"
 
-[node name="DisconnectButton" type="Button" parent="Center/Panel/Margin/VBox/ButtonRow"]
+[node name="DisconnectButton" type="Button" parent="Center/Panel/Margin/VBox/ButtonRow" unique_id=485922951]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 disabled = true
 text = "Prekini"
 
-[node name="RoomSection" type="VBoxContainer" parent="Center/Panel/Margin/VBox"]
+[node name="RoomSection" type="VBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=623022518]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Sep2" type="HSeparator" parent="Center/Panel/Margin/VBox/RoomSection"]
+[node name="Sep2" type="HSeparator" parent="Center/Panel/Margin/VBox/RoomSection" unique_id=1951301350]
 layout_mode = 2
 
-[node name="CreateRoomButton" type="Button" parent="Center/Panel/Margin/VBox/RoomSection"]
+[node name="CreateRoomButton" type="Button" parent="Center/Panel/Margin/VBox/RoomSection" unique_id=1387315518]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "Napravi novu sobu"
 
-[node name="JoinRow" type="HBoxContainer" parent="Center/Panel/Margin/VBox/RoomSection"]
+[node name="JoinRow" type="HBoxContainer" parent="Center/Panel/Margin/VBox/RoomSection" unique_id=1013409631]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="RoomIdEdit" type="LineEdit" parent="Center/Panel/Margin/VBox/RoomSection/JoinRow"]
+[node name="RoomIdEdit" type="LineEdit" parent="Center/Panel/Margin/VBox/RoomSection/JoinRow" unique_id=1690229787]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "ID sobe"
 
-[node name="JoinRoomButton" type="Button" parent="Center/Panel/Margin/VBox/RoomSection/JoinRow"]
+[node name="JoinRoomButton" type="Button" parent="Center/Panel/Margin/VBox/RoomSection/JoinRow" unique_id=417865438]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Udji u sobu"
 
-[node name="Sep3" type="HSeparator" parent="Center/Panel/Margin/VBox"]
+[node name="Sep3" type="HSeparator" parent="Center/Panel/Margin/VBox" unique_id=1506394991]
 layout_mode = 2
 
-[node name="StatusLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="StatusLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=731572152]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
