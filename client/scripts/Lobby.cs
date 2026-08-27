@@ -307,7 +307,7 @@ public partial class Lobby : Control {
         }
     }
 
-    private void OnChat(string content) => AppendLog(content);
+    private void OnChat(string content) => AppendChat(content);
 
     private void OnInfo(string content) => AppendLog(content);
 
@@ -320,7 +320,19 @@ public partial class Lobby : Control {
 
     private void AppendLog(string text, bool isError = false) {
         _log.AppendText(isError
-            ? $"[color=#ff7066]{text}[/color]\n"
-            : text + "\n");
+            ? $"[color=#ff7066]{Escape(text)}[/color]\n"
+            : Escape(text) + "\n");
     }
+
+    /// <summary>Poruke saigraca se odvajaju bojom od sistemskih.</summary>
+    private void AppendChat(string text) {
+        _log.AppendText($"[color=#8fd0ff]{Escape(text)}[/color]\n");
+    }
+
+    /// <summary>
+    /// Log je RichTextLabel sa ukljucenim BBCode-om, pa bi igrac mogao da
+    /// kroz chat ubaci oznake i razbije prikaz ostalima. Uglaste zagrade
+    /// zato prolaze kroz [lb], sto RichTextLabel iscrtava kao obicno "[".
+    /// </summary>
+    private static string Escape(string text) => text.Replace("[", "[lb]");
 }
